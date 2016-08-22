@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Kant.Wpf.Toolkit;
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -27,9 +29,17 @@ namespace Kant.Wpf.Controls.Chart
             diagram.IpSegmentColumnWidth = 25.0;
             diagram.MaxDisplayIpCount = 10;
             diagram.GraphElementBorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#bbbbbb"));
-            //diagram.HighlightOpacity = 1.0;
-            //diagram.LoweredOpacity = 0.25;
+            diagram.HighlightOpacity = 1.0;
+            diagram.LoweredOpacity = 0.25;
             defaultNodesPalette = GetNodeLinksPalette(opacity);
+        }
+
+        public void UpdateLabelAdjustY()
+        {
+            if (diagram.LabelStyle != null)
+            {
+               LabelAdjustedY = MeasureHepler.MeasureString("5", diagram.LabelStyle, CultureInfo.CurrentCulture).Height / 2;
+            }
         }
 
         public Brush SetNodeBrush()
@@ -98,6 +108,11 @@ namespace Kant.Wpf.Controls.Chart
         #region Fields & Properties
 
         public int DefaultNodesPaletteIndex { get; set; }
+
+        /// <summary>
+        /// update while update label style 
+        /// </summary>
+        public double LabelAdjustedY { get; set; }
 
         private IpFlowDiagram diagram;
 

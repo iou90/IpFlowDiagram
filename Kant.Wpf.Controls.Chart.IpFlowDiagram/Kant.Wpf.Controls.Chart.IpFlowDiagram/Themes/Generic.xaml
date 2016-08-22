@@ -7,7 +7,7 @@
         <Setter Property="Margin" Value="1" />
     </Style>
     <Style TargetType="{x:Type local:IpFlowDiagram}">
-        <Setter Property="IpNodeLabelStyle"
+        <Setter Property="LabelStyle"
                 Value="{StaticResource DefaultLabelStyle}" />
         <Setter Property="Template">
             <Setter.Value>

@@ -116,7 +116,7 @@ namespace Kant.Wpf.Controls.Chart
 
             if (CheckTemplatePartExists(srcToDestPort, "PartSrcToDestPort"))
             {
-                assist.SrcToDestContainer = srcToDestPort;
+                assist.SrcToDestPortContainer = srcToDestPort;
             }
 
             if(CheckTemplatePartExists(destPortToIp, "PartDestPortToIp"))
@@ -223,13 +223,13 @@ namespace Kant.Wpf.Controls.Chart
 
         public static readonly DependencyProperty HighlightNodeProperty = DependencyProperty.Register("HighlightNode", typeof(string), typeof(IpFlowDiagram), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, null, HighlightNodeValueCallback));
 
-        public Style IpNodeLabelStyle
+        public Style LabelStyle
         {
-            get { return (Style)GetValue(IpNodeLabelStyleProperty); }
-            set { SetValue(IpNodeLabelStyleProperty, value); }
+            get { return (Style)GetValue(LabelStyleProperty); }
+            set { SetValue(LabelStyleProperty, value); }
         }
 
-        public static readonly DependencyProperty IpNodeLabelStyleProperty = DependencyProperty.Register("IpNodeLabelStyle", typeof(Style), typeof(IpFlowDiagram));
+        public static readonly DependencyProperty LabelStyleProperty = DependencyProperty.Register("LabelStyle", typeof(Style), typeof(IpFlowDiagram));
 
         /// <summary>
         /// 20 by default
@@ -237,6 +237,18 @@ namespace Kant.Wpf.Controls.Chart
         public double IpSegmentColumnWidth { get; set; }
 
         public Brush GraphElementBorderBrush { get; set; }
+
+        /// <summary>
+        /// apply to nodes, links
+        /// 1.0 by default
+        /// </summary>
+        public double HighlightOpacity { get; set; }
+
+        /// <summary>
+        /// apply to nodes, links
+        /// 0.25 by default
+        /// </summary>
+        public double LoweredOpacity { get; set; }
 
         /// <summary>
         /// 10 by default

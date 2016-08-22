@@ -3,6 +3,7 @@ using Kant.Wpf.Toolkit.Mvvm;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -57,10 +58,15 @@ namespace Kant.Wpf.Controls.Chart
                     return;
                 }
 
-                // update nodes
-                ParseDatasToNodes(datas);
+                // filter datas
+                var filteredDatas = FilterDatas(datas);
 
-                // create links
+                if(filteredDatas == null || filteredDatas.Count == 0)
+                {
+                    return;
+                }
+
+                CreateDiagram(filteredDatas);
             }
         }
 
@@ -80,27 +86,49 @@ namespace Kant.Wpf.Controls.Chart
 
         public void ClearDiagram()
         {
-            SrcIpSegment1Nodes = null;
-            SrcIpSegment2Nodes = null;
-            SrcIpSegment3Nodes = null;
-            SrcIpSegment4Nodes = null;
-            DestIpSegment1Nodes = null;
-            DestIpSegment2Nodes = null;
-            DestIpSegment3Nodes = null;
-            DestIpSegment4Nodes = null;
-            ClearLinks();
+            ClearDatas<IpFlowIpNode>(srcIpSegment1Nodes);
+            ClearDatas<IpFlowIpNode>(srcIpSegment2Nodes);
+            ClearDatas<IpFlowIpNode>(srcIpSegment3Nodes);
+            ClearDatas<IpFlowIpNode>(srcIpSegment4Nodes);
+            ClearDatas<IpFlowIpNode>(destIpSegment1Nodes);
+            ClearDatas<IpFlowIpNode>(destIpSegment2Nodes);
+            ClearDatas<IpFlowIpNode>(destIpSegment3Nodes);
+            ClearDatas<IpFlowIpNode>(destIpSegment4Nodes);
+            ClearDatas<IpFlowPortLabel>(srcPortLabels);
+            ClearDatas<IpFlowPortLabel>(destPortLabels);
+            ClearDiagramCanvasChilds();
         }
 
-        public void ClearLinks()
+        public void ClearDiagramCanvasChilds()
         {
+            if (SrcIpToPortContainer != null && SrcIpToPortContainer.Children != null)
+            {
+                SrcIpToPortContainer.Children.Clear();
+            }
+
+            if (DestPortToIpContainer != null && DestPortToIpContainer.Children != null)
+            {
+                DestPortToIpContainer.Children.Clear();
+            }
+
+            if (SrcToDestPortContainer != null && SrcToDestPortContainer.Children != null)
+            {
+                SrcToDestPortContainer.Children.Clear();
+            }
+        }
+
+        private void ClearDatas<T>(List<T> datas)
+        {
+            if(datas != null)
+            {
+                datas.Clear();
+            }
         }
 
         #endregion
 
-        private void ParseDatasToNodes(IEnumerable<IpFlowData> datas)
+        private List<IpFlowData> FilterDatas(IEnumerable<IpFlowData> datas)
         {
-            #region parse datas
-
             var srcIpDic = new Dictionary<string, int>();
             var destIpDic = new Dictionary<string, int>();
 
@@ -116,21 +144,34 @@ namespace Kant.Wpf.Controls.Chart
                 }
             }
 
-            if(srcIpDic.Count <= 0 || destIpDic.Count <= 0)
+            if (srcIpDic.Count == 0 || destIpDic.Count == 0)
             {
-                return;
+                return null;
             }
 
+            // take most commonly occurred ips by MaxDisplayIpCount
             var sortedSrcIps = (from item in srcIpDic orderby item.Value descending select item).ToDictionary(item => item.Key, item => item.Value);
             var sortedDestIps = (from item in destIpDic orderby item.Value descending select item).ToDictionary(item => item.Key, item => item.Value);
             var filterSrcIps = sortedSrcIps.Take(diagram.MaxDisplayIpCount).ToDictionary(item => item.Key, item => item.Value);
             var filterDestIps = sortedDestIps.Take(diagram.MaxDisplayIpCount).ToDictionary(item => item.Key, item => item.Value);
 
-            if(filterSrcIps.Count != filterDestIps.Count)
+            var filteredDatas = new List<IpFlowData>();
+
+            foreach (var data in datas)
             {
-                return;
+                if (!filterSrcIps.Keys.Contains(data.SourceIp) || !filterDestIps.Keys.Contains(data.DestinationIp))
+                {
+                    continue;
+                }
+
+                filteredDatas.Add(data);
             }
 
+            return filteredDatas;
+        }
+
+        private void CreateDiagram(List<IpFlowData> datas)
+        {
             var srcIp1Dic = new Dictionary<string, int>();
             var srcIp2Dic = new Dictionary<string, int>();
             var srcIp3Dic = new Dictionary<string, int>();
@@ -139,19 +180,8 @@ namespace Kant.Wpf.Controls.Chart
             var destIp2Dic = new Dictionary<string, int>();
             var destIp3Dic = new Dictionary<string, int>();
             var destIp4Dic = new Dictionary<string, int>();
-            var filterDatas = new List<IpFlowData>();
 
-            foreach(var data in datas)
-            {
-                if (!filterSrcIps.Keys.Contains(data.SourceIp) || !filterDestIps.Keys.Contains(data.DestinationIp))
-                {
-                    continue;
-                }
-
-                filterDatas.Add(data);
-            }
-
-            foreach (var data in filterDatas)
+            foreach (var data in datas)
             {
                 var srcIpStringArray = data.SourceIp.ToString().Split('.');
                 BuildDictionary(srcIpStringArray[0], srcIp1Dic);
@@ -165,22 +195,31 @@ namespace Kant.Wpf.Controls.Chart
                 BuildDictionary(destIpStringArray[3], destIp4Dic);
             }
 
-            #endregion
-
-            #region add nodes
-
             var ipColumnHeight = SrcIpSegment1Container.ActualHeight;
             styleManager.DefaultNodesPaletteIndex = 0;
-            var src1Ips = new List<IpFlowNode>();
-            var src2Ips = new List<IpFlowNode>();
-            var src3Ips = new List<IpFlowNode>();
-            var src4Ips = new List<IpFlowNode>();
-            var dest1Ips = new List<IpFlowNode>();
-            var dest2Ips = new List<IpFlowNode>();
-            var dest3Ips = new List<IpFlowNode>();
-            var dest4Ips = new List<IpFlowNode>();
+            var src1Ips = new List<IpFlowIpNode>();
+            var src2Ips = new List<IpFlowIpNode>();
+            var src3Ips = new List<IpFlowIpNode>();
+            var src4Ips = new List<IpFlowIpNode>();
+            var dest1Ips = new List<IpFlowIpNode>();
+            var dest2Ips = new List<IpFlowIpNode>();
+            var dest3Ips = new List<IpFlowIpNode>();
+            var dest4Ips = new List<IpFlowIpNode>();
+            var srcPort200 = CreatePortLabel(200, true);
+            var destPort200 = CreatePortLabel(200, false);
 
-            foreach (var data in filterDatas)
+            if (srcPort200 == null || destPort200 == null)
+            {
+                return;
+            }
+
+            srcPortLabels = new List<IpFlowPortLabel>() { srcPort200 };
+            destPortLabels = new List<IpFlowPortLabel>() { destPort200 };
+            SrcIpToPortContainer.Children.Add(srcPort200.Label);
+            DestPortToIpContainer.Children.Add(destPort200.Label);
+            styleManager.UpdateLabelAdjustY();
+
+            foreach (var data in datas)
             {
                 var srcIpStringArray = data.SourceIp.Split('.');
                 AddNode(srcIpStringArray[0], data, ipColumnHeight, srcIp1Dic, src1Ips);
@@ -192,6 +231,8 @@ namespace Kant.Wpf.Controls.Chart
                 AddNode(destIpStringArray[1], data, ipColumnHeight, destIp2Dic, dest2Ips);
                 AddNode(destIpStringArray[2], data, ipColumnHeight, destIp3Dic, dest3Ips);
                 AddNode(destIpStringArray[3], data, ipColumnHeight, destIp4Dic, dest4Ips);
+                AddPortLabel(data.SourcePort, srcPortLabels, true);
+                AddPortLabel(data.DestinationPort, destPortLabels, false);
             }
 
             SrcIpSegment1Nodes = src1Ips;
@@ -202,16 +243,26 @@ namespace Kant.Wpf.Controls.Chart
             DestIpSegment2Nodes = dest2Ips;
             DestIpSegment3Nodes = dest3Ips;
             DestIpSegment4Nodes = dest4Ips;
-
-            #endregion
         }
 
-        private void AddNode(string value, IpFlowData data, double columnHeight, Dictionary<string, int> ipSegmentDic, List<IpFlowNode> nodes)
+        private void BuildDictionary(string value, Dictionary<string, int> dictionary)
+        {
+            if (dictionary.Keys.Contains(value))
+            {
+                dictionary[value]++;
+            }
+            else
+            {
+                dictionary.Add(value, 1);
+            }
+        }
+
+        private void AddNode(string value, IpFlowData data, double columnHeight, Dictionary<string, int> ipSegmentDic, List<IpFlowIpNode> nodes)
         {
             var count = ipSegmentDic.Values.Sum();
             var height = ipSegmentDic[value] / (double)count * columnHeight;
 
-            var node = new IpFlowNode()
+            var node = new IpFlowIpNode()
             {
                 Height = height,
                 Value = value,
@@ -226,15 +277,136 @@ namespace Kant.Wpf.Controls.Chart
             }
         }
 
-        private void BuildDictionary(string value, Dictionary<string, int> dictionary)
+        /// <summary>
+        /// add label to src\destPortLabels
+        /// </summary>
+        /// <param name="srcOrDest">true means src, positioning left</param>
+        private void AddPortLabel(int port, List<IpFlowPortLabel> labels, bool srcOrDest)
         {
-            if (dictionary.Keys.Contains(value))
+            var label = CreatePortLabel(port, srcOrDest);
+
+            if (label == null)
             {
-                dictionary[value]++;
+                return;
+            }
+
+            if (labels.Exists(p => p.Value == label.Value))
+            {
+                return;
+            }
+
+            labels.Add(label);
+
+            if (srcOrDest)
+            {
+                SrcIpToPortContainer.Children.Add(label.Label);
             }
             else
             {
-                dictionary.Add(value, 1);
+                DestPortToIpContainer.Children.Add(label.Label);
+            }
+        }
+
+        /// <summary>
+        /// create label & set position
+        /// </summary>
+        /// <param name="srcOrDest">true means src, positioning left</param>
+        private IpFlowPortLabel CreatePortLabel(int port, bool srcOrDest)
+        {
+            var containerHeight = SrcToDestPortContainer.ActualHeight;
+
+            if(containerHeight <= 0)
+            {
+                return null;
+            }
+
+            double y = -1;
+            var value = port;
+            var halfHeight = containerHeight / 2;
+
+            if (port == 200)
+            {
+                y = halfHeight;
+            }
+            else if (0 <= port && port < 200)
+            {
+                y = (1 - port / 200.0) * halfHeight + halfHeight;
+            }
+            else if (200 < port && port <= 60000)
+            {
+                value = ((port / 10000) + 1) * 10000;
+                y = AdjustLabelYPosition(value, halfHeight);
+            }
+            else if (60000 < port && port <= 65535)
+            {
+                value = 65535;
+                y = AdjustLabelYPosition(value, halfHeight);
+            }
+            else
+            {
+                return null;
+            }
+
+            if(y < 0)
+            {
+                return null;
+            }
+
+            y = y - styleManager.LabelAdjustedY;
+
+            var portLabel = new IpFlowPortLabel()
+            {
+                Value = value,
+                Y = y,
+
+                Label = new TextBlock()
+                {
+                    Text = value.ToString()
+                }
+            };
+
+            if(diagram.LabelStyle != null)
+            {
+                portLabel.Label.Style = diagram.LabelStyle;
+            }
+
+            Canvas.SetBottom(portLabel.Label, portLabel.Y);
+
+            if (srcOrDest)
+            {
+                Canvas.SetRight(portLabel.Label, 0);
+            }
+            else
+            {
+                Canvas.SetLeft(portLabel.Label, 0);
+            }
+
+            return portLabel;
+        }
+
+        private double AdjustLabelYPosition(int port, double height)
+        {
+            if(port > maxPort)
+            {
+                maxPort = port;
+            }
+
+            UpdatePortLabelPosition(srcPortLabels, height);
+            UpdatePortLabelPosition(destPortLabels, height);
+            var y = (1 - (port / maxPort)) * height;
+
+            return y;
+        }
+
+        private void UpdatePortLabelPosition(List<IpFlowPortLabel> labels, double height)
+        {
+            foreach (var portLabel in labels)
+            {
+                if (portLabel.Value > 200)
+                {
+                    portLabel.Y = (1 - (portLabel.Value / maxPort)) * height - styleManager.LabelAdjustedY;
+                    Canvas.SetBottom(portLabel.Label, portLabel.Y);
+                }
             }
         }
 
@@ -292,7 +464,7 @@ namespace Kant.Wpf.Controls.Chart
 
         public Canvas SrcIpToPortContainer { get; set; }
 
-        public Canvas SrcToDestContainer { get; set; }
+        public Canvas SrcToDestPortContainer { get; set; }
 
         public Canvas DestPortToIpContainer { get; set; }
 
@@ -300,8 +472,8 @@ namespace Kant.Wpf.Controls.Chart
 
         #region nodes containers sources
 
-        private List<IpFlowNode> srcIpSegment1Nodes;
-        public List<IpFlowNode> SrcIpSegment1Nodes
+        private List<IpFlowIpNode> srcIpSegment1Nodes;
+        public IReadOnlyList<IpFlowIpNode> SrcIpSegment1Nodes
         {
             get
             {
@@ -309,13 +481,13 @@ namespace Kant.Wpf.Controls.Chart
             }
             set
             {
-                srcIpSegment1Nodes = value;
+                srcIpSegment1Nodes = value == null ? null : value.ToList();
                 RaisePropertyChanged(() => SrcIpSegment1Nodes);
             }
         }
 
-        private List<IpFlowNode> srcIpSegment2Nodes;
-        public List<IpFlowNode> SrcIpSegment2Nodes
+        private List<IpFlowIpNode> srcIpSegment2Nodes;
+        public IReadOnlyList<IpFlowIpNode> SrcIpSegment2Nodes
         {
             get
             {
@@ -323,13 +495,13 @@ namespace Kant.Wpf.Controls.Chart
             }
             set
             {
-                srcIpSegment2Nodes = value;
+                srcIpSegment2Nodes = value == null ? null : value.ToList();
                 RaisePropertyChanged(() => SrcIpSegment2Nodes);
             }
         }
 
-        private List<IpFlowNode> srcIpSegment3Nodes;
-        public List<IpFlowNode> SrcIpSegment3Nodes
+        private List<IpFlowIpNode> srcIpSegment3Nodes;
+        public IReadOnlyList<IpFlowIpNode> SrcIpSegment3Nodes
         {
             get
             {
@@ -337,13 +509,13 @@ namespace Kant.Wpf.Controls.Chart
             }
             set
             {
-                srcIpSegment3Nodes = value;
+                srcIpSegment3Nodes = value == null ? null : value.ToList();
                 RaisePropertyChanged(() => SrcIpSegment3Nodes);
             }
         }
 
-        private List<IpFlowNode> srcIpSegment4Nodes;
-        public List<IpFlowNode> SrcIpSegment4Nodes
+        private List<IpFlowIpNode> srcIpSegment4Nodes;
+        public IReadOnlyList<IpFlowIpNode> SrcIpSegment4Nodes
         {
             get
             {
@@ -351,13 +523,13 @@ namespace Kant.Wpf.Controls.Chart
             }
             set
             {
-                srcIpSegment4Nodes = value;
+                srcIpSegment4Nodes = value == null ? null : value.ToList();
                 RaisePropertyChanged(() => SrcIpSegment4Nodes);
             }
         }
 
-        private List<IpFlowNode> destIpSegment1Nodes;
-        public List<IpFlowNode> DestIpSegment1Nodes
+        private List<IpFlowIpNode> destIpSegment1Nodes;
+        public IReadOnlyList<IpFlowIpNode> DestIpSegment1Nodes
         {
             get
             {
@@ -365,13 +537,13 @@ namespace Kant.Wpf.Controls.Chart
             }
             set
             {
-                destIpSegment1Nodes = value;
+                destIpSegment1Nodes = value == null ? null : value.ToList();
                 RaisePropertyChanged(() => DestIpSegment1Nodes);
             }
         }
 
-        private List<IpFlowNode> destIpSegment2Nodes;
-        public List<IpFlowNode> DestIpSegment2Nodes
+        private List<IpFlowIpNode> destIpSegment2Nodes;
+        public IReadOnlyList<IpFlowIpNode> DestIpSegment2Nodes
         {
             get
             {
@@ -379,13 +551,13 @@ namespace Kant.Wpf.Controls.Chart
             }
             set
             {
-                destIpSegment2Nodes = value;
+                destIpSegment2Nodes = value == null ? null : value.ToList();
                 RaisePropertyChanged(() => DestIpSegment2Nodes);
             }
         }
 
-        private List<IpFlowNode> destIpSegment3Nodes;
-        public List<IpFlowNode> DestIpSegment3Nodes
+        private List<IpFlowIpNode> destIpSegment3Nodes;
+        public IReadOnlyList<IpFlowIpNode> DestIpSegment3Nodes
         {
             get
             {
@@ -393,13 +565,13 @@ namespace Kant.Wpf.Controls.Chart
             }
             set
             {
-                destIpSegment3Nodes = value;
+                destIpSegment3Nodes = value == null ? null : value.ToList();
                 RaisePropertyChanged(() => DestIpSegment3Nodes);
             }
         }
 
-        private List<IpFlowNode> destIpSegment4Nodes;
-        public List<IpFlowNode> DestIpSegment4Nodes
+        private List<IpFlowIpNode> destIpSegment4Nodes;
+        public IReadOnlyList<IpFlowIpNode> DestIpSegment4Nodes
         {
             get
             {
@@ -407,12 +579,32 @@ namespace Kant.Wpf.Controls.Chart
             }
             set
             {
-                destIpSegment4Nodes = value;
+                destIpSegment4Nodes = value == null ? null : value.ToList();
                 RaisePropertyChanged(() => DestIpSegment4Nodes);
             }
         }
 
         #endregion
+
+        private List<IpFlowPortLabel> srcPortLabels;
+        public IReadOnlyList<IpFlowPortLabel> SrcPortLabels
+        {
+            get
+            {
+                return srcPortLabels;
+            }
+        }
+
+        private List<IpFlowPortLabel> destPortLabels;
+        public IReadOnlyList<IpFlowPortLabel> DestPortLabels
+        {
+            get
+            {
+                return destPortLabels;
+            }
+        }
+
+        private double maxPort;
 
         private IpFlowDiagram diagram;
 

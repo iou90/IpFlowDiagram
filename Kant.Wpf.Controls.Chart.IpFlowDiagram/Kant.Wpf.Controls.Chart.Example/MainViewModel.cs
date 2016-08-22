@@ -29,7 +29,7 @@ namespace Kant.Wpf.Controls.Chart.Example
             //BubbleLabelStyle = bubbleLabelStyle2;
 
             // random datas
-            var count = 15;
+            var count = 55;
             var datas = new List<IpFlowData>();
 
             for(var index = 0; index < count; index++)
@@ -38,13 +38,15 @@ namespace Kant.Wpf.Controls.Chart.Example
                 {
                     //SourceIp = "192.168.1." + random.Next(1, 255).ToString(),
                     //DestinationIp = "10.0.0." + random.Next(1, 255).ToString(),
-                    DestinationPort = random.Next(1, 65535),
-                    SourcePort = random.Next(1, 65535),
+                    DestinationPort = random.Next(0, 65535),
+                    SourcePort = random.Next(0, 65535),
                     SourceIp = "192.168.1." + random.Next(1, 5),
                     DestinationIp = "10.0.0." + random.Next(1, 5)
                 });
             }
 
+            datas[0].SourcePort = 0;
+            datas[1].DestinationPort = 65535;
             Datas = datas;
             BubbleBrushes = new Dictionary<string, Brush>() { { "word1", bubbleColor } };
         }
@@ -67,10 +69,10 @@ namespace Kant.Wpf.Controls.Chart.Example
                     {
                         datas.Add(new IpFlowData()
                         {
-                            SourceIp = random.Next(1, 192).ToString() + "." + random.Next(1, 168).ToString() + "." + random.Next(1, 55).ToString() + "." + random.Next(1, 255),
-                            DestinationIp = random.Next(1, 192).ToString() + "." + random.Next(1, 168).ToString() + "." + random.Next(1, 55).ToString() + "." + random.Next(1, 255),
-                            DestinationPort = random.Next(1, 65535),
-                            SourcePort = random.Next(1, 65535),
+                            SourceIp = random.Next(1, 192).ToString() + "." + random.Next(0, 168).ToString() + "." + random.Next(0, 55).ToString() + "." + random.Next(1, 255),
+                            DestinationIp = random.Next(1, 192).ToString() + "." + random.Next(0, 168).ToString() + "." + random.Next(0, 55).ToString() + "." + random.Next(1, 255),
+                            DestinationPort = random.Next(0, 65535),
+                            SourcePort = random.Next(0, 65535),
                         });
                     }
 
