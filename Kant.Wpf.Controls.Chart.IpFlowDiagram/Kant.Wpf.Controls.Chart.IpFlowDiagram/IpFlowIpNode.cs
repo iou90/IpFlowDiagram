@@ -3,37 +3,34 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Controls;
-using System.Windows.Media;
-using System.Windows.Shapes;
 
 namespace Kant.Wpf.Controls.Chart
 {
-    public class IpFlowIpNode : Element
+    public class IpFlowIpNode
     {
-        public double Height { get; set; }
+        public IpFlowIpNode()
+        {
+            ipSegments = new IpFlowIpSegmentNode[4];
+        }
 
-        public double Y { get; set; }
+        public IpFlowIpSegmentNode GetSegment(int index)
+        {
+            return ipSegments[index];
+        }
 
-        public Brush Color { get; set; }
+        public void SetSegment(IpFlowIpSegmentNode segment, int index)
+        {
+            if(ipSegments[index] != null)
+            {
+                return;
+            }
 
-        /// <summary>
-        /// ip segment
-        /// </summary>
-        public string Value { get; set; }
+            ipSegments[index] = segment;
+        }
 
-        #region for highlight
+        // ip address
+        public string IpAddress { get; set; }
 
-        public IpFlowIpNode Segment1 { get; set; }
-
-        public IpFlowIpNode Segment2 { get; set; }
-
-        public IpFlowIpNode Segment3 { get; set; }
-
-        public IpFlowIpNode Segment4 { get; set; }
-
-        public List<IpFlowLink> Links { get; set; }
-
-        #endregion
+        private IpFlowIpSegmentNode[] ipSegments;
     }
 }

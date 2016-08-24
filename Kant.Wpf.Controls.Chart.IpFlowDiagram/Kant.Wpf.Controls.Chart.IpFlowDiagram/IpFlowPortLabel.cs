@@ -9,10 +9,11 @@ namespace Kant.Wpf.Controls.Chart
 {
     public class IpFlowPortLabel
     {
-        /// <summary>
-        /// port
-        /// </summary>
-        public int Value { get; set; }
+        public IpFlowPortLabel()
+        {
+        }
+
+        public int Port { get; set; }
 
         public TextBlock Label { get; set; }
 

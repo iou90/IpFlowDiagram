@@ -36,7 +36,7 @@
                                 <Setter Property="ItemTemplate">
                                     <Setter.Value>
                                         <DataTemplate>
-                                            <Grid Tag="{Binding Value}">
+                                            <Grid Tag="{Binding IpAddress}">
                                                 <!--<i:Interaction.Triggers>
                                                     <i:EventTrigger EventName="MouseLeftButtonUp" 
                                                 </i:Interaction.Triggers>-->
@@ -44,8 +44,8 @@
                                                            Height="{Binding Height}" />
                                                 <TextBlock HorizontalAlignment="Center"
                                                            VerticalAlignment="Center"
-                                                           Text="{Binding Value}"
-                                                           Style="{Binding IpNodeLabelStyle, RelativeSource={RelativeSource AncestorType=local:IpFlowDiagram}}" />
+                                                           Text="{Binding Segment}"
+                                                           Style="{Binding LabelStyle, RelativeSource={RelativeSource AncestorType=local:IpFlowDiagram}}" />
                                             </Grid>
                                         </DataTemplate>
                                     </Setter.Value>
@@ -84,7 +84,7 @@
                         <Border Background="{Binding GraphElementBorderBrush, RelativeSource={RelativeSource AncestorType=local:IpFlowDiagram}}"
                                 Width="1"
                                 Grid.Column="7" />
-                        <Canvas x:Name="PartDestPortToIp"
+                        <Canvas x:Name="PartDestIpToPort"
                                 Grid.Column="8" />
                         <ItemsControl x:Name="PartDestIpSegment4"
                                       Grid.Column="9" />

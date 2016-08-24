@@ -55,8 +55,13 @@
     <Compile Include="Element.cs" />
     <Compile Include="IpFlowData.cs" />
     <Compile Include="IpFlowIpNode.cs" />
+    <Compile Include="IpFlowIpSegmentNode.cs" />
+    <Compile Include="IpFlowIpToPortLink.cs" />
     <Compile Include="IpFlowLink.cs" />
+    <Compile Include="IpFlowLinkBase.cs" />
+    <Compile Include="IpFlowNode.cs" />
     <Compile Include="IpFlowPortLabel.cs" />
+    <Compile Include="IpFlowPortLink.cs" />
     <Compile Include="IpFlowStyleManager.cs" />
     <Page Include="Themes\Generic.xaml">
       <Generator>MSBuild:Compile</Generator>

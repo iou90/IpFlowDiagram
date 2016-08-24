@@ -26,12 +26,15 @@ namespace Kant.Wpf.Controls.Chart
         public void SetDefaultStyles()
         {
             var opacity = 0.55;
+            defaultNodesPalette = GetNodeLinksPalette(opacity);
+            diagram.LinkBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#9ceaff"));
             diagram.IpSegmentColumnWidth = 25.0;
             diagram.MaxDisplayIpCount = 10;
             diagram.GraphElementBorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#bbbbbb"));
             diagram.HighlightOpacity = 1.0;
             diagram.LoweredOpacity = 0.25;
-            defaultNodesPalette = GetNodeLinksPalette(opacity);
+            LinkFillOpacity = 0.25;
+            LinkStrokeOpacity = 0.75;
         }
 
         public void UpdateLabelAdjustY()
@@ -113,6 +116,10 @@ namespace Kant.Wpf.Controls.Chart
         /// update while update label style 
         /// </summary>
         public double LabelAdjustedY { get; set; }
+
+        public double LinkFillOpacity { get; set; }
+
+        public double LinkStrokeOpacity { get; set; }
 
         private IpFlowDiagram diagram;
 

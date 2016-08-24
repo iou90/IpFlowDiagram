@@ -38,8 +38,10 @@ namespace Kant.Wpf.Controls.Chart.Example
                 {
                     //SourceIp = "192.168.1." + random.Next(1, 255).ToString(),
                     //DestinationIp = "10.0.0." + random.Next(1, 255).ToString(),
-                    DestinationPort = random.Next(0, 65535),
-                    SourcePort = random.Next(0, 65535),
+                    //DestinationPort = random.Next(0, 65535),
+                    DestinationPort = random.Next(0, 2) == 1 ? 155 : 55555,
+                    //SourcePort = random.Next(0, 65535),
+                    SourcePort = random.Next(0, 2) == 1 ? 55 : 25555,
                     SourceIp = "192.168.1." + random.Next(1, 5),
                     DestinationIp = "10.0.0." + random.Next(1, 5)
                 });

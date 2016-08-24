@@ -3,10 +3,23 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
+using System.Windows.Shapes;
 
 namespace Kant.Wpf.Controls.Chart
 {
-    public class IpFlowLink : Element
+    public class IpFlowLink
     {
+        public IpFlowLink()
+        {
+        }
+
+        public IpFlowIpToPortLink SrcIpToPortLink { get; set; }
+
+        public IpFlowIpToPortLink DestPortToIpLink { get; set; }
+
+        public IpFlowPortLink SrcToDestPortLink { get; set; }
+
+        public Brush OriginalBrush { get; set; }
     }
 }

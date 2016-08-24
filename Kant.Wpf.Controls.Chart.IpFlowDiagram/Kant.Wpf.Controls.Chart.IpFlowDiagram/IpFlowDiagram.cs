@@ -26,7 +26,7 @@ namespace Kant.Wpf.Controls.Chart
     [TemplatePart(Name = "PartDestIpSegment4", Type = typeof(ItemsControl))]
     [TemplatePart(Name = "PartSrcIpToPort", Type = typeof(Canvas))]
     [TemplatePart(Name = "PartSrcToDestPort", Type = typeof(Canvas))]
-    [TemplatePart(Name = "PartDestPortToIp", Type = typeof(Canvas))]
+    [TemplatePart(Name = "PartDestIpToPort", Type = typeof(Canvas))]
     public class IpFlowDiagram : Control, IDisposable
     {
         #region Constructor
@@ -62,7 +62,7 @@ namespace Kant.Wpf.Controls.Chart
             var dest4 = GetTemplateChild("PartDestIpSegment4") as ItemsControl;
             var srcIpToPort = GetTemplateChild("PartSrcIpToPort") as Canvas;
             var srcToDestPort = GetTemplateChild("PartSrcToDestPort") as Canvas;
-            var destPortToIp = GetTemplateChild("PartDestPortToIp") as Canvas;
+            var destIpToPort = GetTemplateChild("PartDestIpToPort") as Canvas;
 
             if (CheckTemplatePartExists(grid, "PartDiagramGrid"))
             {
@@ -119,9 +119,9 @@ namespace Kant.Wpf.Controls.Chart
                 assist.SrcToDestPortContainer = srcToDestPort;
             }
 
-            if(CheckTemplatePartExists(destPortToIp, "PartDestPortToIp"))
+            if(CheckTemplatePartExists(destIpToPort, "PartDestIpToPort"))
             {
-                assist.DestPortToIpContainer = destPortToIp;
+                assist.DestIpToPortContainer = destIpToPort;
             }
 
             assist.SetIpNodesSource();
@@ -191,13 +191,15 @@ namespace Kant.Wpf.Controls.Chart
 
         private void IpFlowDiagramLoaded(object sender, RoutedEventArgs e)
         {
-            assist.UpdateDiagram(Datas);
+            assist.DrawDiagram();
             Loaded -= IpFlowDiagramLoaded;
         }
 
         #endregion
 
         #region Fields & Properties
+
+        #region dependency properties
 
         public IEnumerable<IpFlowData> Datas
         {
@@ -231,12 +233,21 @@ namespace Kant.Wpf.Controls.Chart
 
         public static readonly DependencyProperty LabelStyleProperty = DependencyProperty.Register("LabelStyle", typeof(Style), typeof(IpFlowDiagram));
 
+        #endregion
+
         /// <summary>
         /// 20 by default
         /// </summary>
         public double IpSegmentColumnWidth { get; set; }
 
         public Brush GraphElementBorderBrush { get; set; }
+
+        public Brush LinkBrush { get; set; }
+
+        /// <summary>
+        /// 0.55 by default, ranged from 0 to 1
+        /// </summary>
+        public double IpToPortLinkCurvature { get; set; }
 
         /// <summary>
         /// apply to nodes, links
