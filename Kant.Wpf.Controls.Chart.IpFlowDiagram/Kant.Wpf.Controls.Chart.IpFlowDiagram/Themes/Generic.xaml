@@ -75,17 +75,20 @@
                         <ItemsControl x:Name="PartSrcIpSegment4"
                                       Grid.Column="3" />
                         <Canvas x:Name="PartSrcIpToPort"
-                                Grid.Column="4" />
+                                Grid.Column="4"
+                                ClipToBounds="True" />
                         <Border Background="{Binding GraphElementBorderBrush, RelativeSource={RelativeSource AncestorType=local:IpFlowDiagram}}"
                                 Width="1"
                                 Grid.Column="5" />
                         <Canvas x:Name="PartSrcToDestPort"
-                                Grid.Column="6" />
+                                Grid.Column="6"
+                                ClipToBounds="True" />
                         <Border Background="{Binding GraphElementBorderBrush, RelativeSource={RelativeSource AncestorType=local:IpFlowDiagram}}"
                                 Width="1"
                                 Grid.Column="7" />
                         <Canvas x:Name="PartDestIpToPort"
-                                Grid.Column="8" />
+                                Grid.Column="8"
+                                ClipToBounds="True" />
                         <ItemsControl x:Name="PartDestIpSegment4"
                                       Grid.Column="9" />
                         <ItemsControl x:Name="PartDestIpSegment3"

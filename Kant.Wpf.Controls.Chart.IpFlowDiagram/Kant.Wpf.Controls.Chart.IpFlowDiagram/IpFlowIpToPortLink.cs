@@ -13,7 +13,7 @@ namespace Kant.Wpf.Controls.Chart
         {
         }
 
-        public IpFlowIpSegmentNode Node { get; set; }
+        public IpFlowIpSegment4 Node { get; set; }
 
         public string Segment { get; set; }
 

@@ -9,15 +9,13 @@ using System.Windows.Shapes;
 
 namespace Kant.Wpf.Controls.Chart
 {
-    public class IpFlowIpSegmentNode
+    public class IpFlowIpSegment
     {
-        public IpFlowIpSegmentNode()
+        public IpFlowIpSegment()
         {
         }
 
         public double Height { get; set; }
-
-        public double Y { get; set; }
 
         public Brush Color { get; set; }
 

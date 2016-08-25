@@ -10,15 +10,15 @@ namespace Kant.Wpf.Controls.Chart
     {
         public IpFlowIpNode()
         {
-            ipSegments = new IpFlowIpSegmentNode[4];
+            ipSegments = new IpFlowIpSegment[4];
         }
 
-        public IpFlowIpSegmentNode GetSegment(int index)
+        public IpFlowIpSegment GetSegment(int index)
         {
             return ipSegments[index];
         }
 
-        public void SetSegment(IpFlowIpSegmentNode segment, int index)
+        public void SetSegment(IpFlowIpSegment segment, int index)
         {
             if(ipSegments[index] != null)
             {
@@ -31,6 +31,6 @@ namespace Kant.Wpf.Controls.Chart
         // ip address
         public string IpAddress { get; set; }
 
-        private IpFlowIpSegmentNode[] ipSegments;
+        private IpFlowIpSegment[] ipSegments;
     }
 }

@@ -122,12 +122,17 @@ namespace Kant.Wpf.Controls.Chart
 
         public void DrawDiagram()
         {
+            if (filteredDatas == null || filteredDatas.Count == 0)
+            {
+                return;
+            }
+
             if (DiagramGrid.ActualHeight <= 0 || (DiagramGrid.ActualWidth - 5 - diagram.IpSegmentColumnWidth * 8) <= 0)
             {
                 return;
             }
 
-            if (filteredDatas == null || filteredDatas.Count == 0)
+            if(SrcIpToPortContainer.ActualWidth <= 0 || SrcToDestPortContainer.ActualWidth <= 0 || DestIpToPortContainer.ActualWidth <=0)
             {
                 return;
             }
@@ -155,24 +160,37 @@ namespace Kant.Wpf.Controls.Chart
 
             foreach (var data in ipDatas)
             {
+                var fillBrush = diagram.LinkBrush.CloneCurrentValue();
+                fillBrush.Opacity = styleManager.LinkFillOpacity;
+                var strokeBrush = diagram.LinkBrush.CloneCurrentValue();
+                strokeBrush.Opacity = styleManager.LinkStrokeOpacity;
                 BuildCountDictionary(data.SrcIpSegments[0], srcIp1Dic);
                 BuildCountDictionary(data.SrcIpSegments[1], srcIp2Dic);
                 BuildCountDictionary(data.SrcIpSegments[2], srcIp3Dic);
                 var s4 = data.SrcIpSegments[3];
                 BuildCountDictionary(s4, srcIp4Dic);
-                BuildLinks(CreateLink(data.SourcePort, s4), srcIpToPortLinks, l => l.Segment == s4 && l.Port == data.SourcePort);
+                var srcIpToPortLink = BuildLinks(CreateLink(data.SourcePort, s4, fillBrush, strokeBrush), srcIpToPortLinks, l => l.Segment == s4 && l.Port == data.SourcePort);
                 BuildCountDictionary(data.DestSegments[0], destIp1Dic);
                 BuildCountDictionary(data.DestSegments[1], destIp2Dic);
                 BuildCountDictionary(data.DestSegments[2], destIp3Dic);
                 var d4 = data.DestSegments[3];
                 BuildCountDictionary(d4, destIp4Dic);
-                BuildLinks(CreateLink(data.DestinationPort, d4), destIpToPortLinks, l => l.Segment == d4 && l.Port == data.DestinationPort);
-                BuildLinks(CreateLink(data.SourcePort, data.DestinationPort), portLinks, l => l.SourcePort == data.SourcePort && l.DestinationPort == data.DestinationPort);
+                var destIpToPortLink = BuildLinks(CreateLink(data.DestinationPort, d4, fillBrush, strokeBrush), destIpToPortLinks, l => l.Segment == d4 && l.Port == data.DestinationPort);
+                var portLink = BuildLinks(CreateLink(data.SourcePort, data.DestinationPort, fillBrush, strokeBrush), portLinks, l => l.SourcePort == data.SourcePort && l.DestinationPort == data.DestinationPort);
+
+                links.Add(new IpFlowLink()
+                {
+                    OriginalLinkFillBrush = fillBrush.CloneCurrentValue(),
+                    OriginalLinkStrokeBrush = strokeBrush.CloneCurrentValue(),
+                    SrcIpToPortLink = srcIpToPortLink,
+                    DestPortToIpLink = destIpToPortLink,
+                    SrcToDestPortLink = portLink
+                });
             }
 
             #endregion
 
-            #region ip segment nodes & port labels
+            #region ip segment node & port labels
 
             var srcPort200 = CreateSrcPortLabel(200);
             var destPort200 = CreateDestPortLabel(200);
@@ -189,14 +207,14 @@ namespace Kant.Wpf.Controls.Chart
             styleManager.UpdateLabelAdjustY();
             var ipColumnHeight = SrcIpSegment1Container.ActualHeight;
             styleManager.DefaultNodesPaletteIndex = 0;
-            var src1Ips = new List<IpFlowIpSegmentNode>();
-            var src2Ips = new List<IpFlowIpSegmentNode>();
-            var src3Ips = new List<IpFlowIpSegmentNode>();
-            var src4Ips = new List<IpFlowIpSegmentNode>();
-            var dest1Ips = new List<IpFlowIpSegmentNode>();
-            var dest2Ips = new List<IpFlowIpSegmentNode>();
-            var dest3Ips = new List<IpFlowIpSegmentNode>();
-            var dest4Ips = new List<IpFlowIpSegmentNode>();
+            var src1Ips = new List<IpFlowIpSegment>();
+            var src2Ips = new List<IpFlowIpSegment>();
+            var src3Ips = new List<IpFlowIpSegment>();
+            var src4Ips = new List<IpFlowIpSegment4>();
+            var dest1Ips = new List<IpFlowIpSegment>();
+            var dest2Ips = new List<IpFlowIpSegment>();
+            var dest3Ips = new List<IpFlowIpSegment>();
+            var dest4Ips = new List<IpFlowIpSegment4>();
             nodes = new List<IpFlowNode>();
 
             foreach (var data in ipDatas)
@@ -206,20 +224,20 @@ namespace Kant.Wpf.Controls.Chart
                     IpAddress = data.SourceIp
                 };
 
-                AddNode(data.SrcIpSegments[0], data.Color, ipColumnHeight, srcIp1Dic, src1Ips, 0, srcIpNode);
-                AddNode(data.SrcIpSegments[1], data.Color, ipColumnHeight, srcIp2Dic, src2Ips, 1, srcIpNode);
-                AddNode(data.SrcIpSegments[2], data.Color, ipColumnHeight, srcIp3Dic, src3Ips, 2, srcIpNode);
-                AddNode(data.SrcIpSegments[3], data.Color, ipColumnHeight, srcIp4Dic, src4Ips, srcIpNode, srcIpToPortLinks);
+                AddSegment(data.SrcIpSegments[0], data.Color, ipColumnHeight, srcIp1Dic, src1Ips, 0, srcIpNode);
+                AddSegment(data.SrcIpSegments[1], data.Color, ipColumnHeight, srcIp2Dic, src2Ips, 1, srcIpNode);
+                AddSegment(data.SrcIpSegments[2], data.Color, ipColumnHeight, srcIp3Dic, src3Ips, 2, srcIpNode);
+                AddSegment(data.SrcIpSegments[3], data.Color, ipColumnHeight, srcIp4Dic, src4Ips, srcIpNode, srcIpToPortLinks);
 
                 var destIpNode = new IpFlowIpNode()
                 {
                     IpAddress = data.DestinationIp
                 };
 
-                AddNode(data.DestSegments[0], data.Color, ipColumnHeight, destIp1Dic, dest1Ips, 0, destIpNode);
-                AddNode(data.DestSegments[1], data.Color, ipColumnHeight, destIp2Dic, dest2Ips, 1, destIpNode);
-                AddNode(data.DestSegments[2], data.Color, ipColumnHeight, destIp3Dic, dest3Ips, 2, destIpNode);
-                AddNode(data.DestSegments[3], data.Color, ipColumnHeight, destIp4Dic, dest4Ips, destIpNode, destIpToPortLinks);
+                AddSegment(data.DestSegments[0], data.Color, ipColumnHeight, destIp1Dic, dest1Ips, 0, destIpNode);
+                AddSegment(data.DestSegments[1], data.Color, ipColumnHeight, destIp2Dic, dest2Ips, 1, destIpNode);
+                AddSegment(data.DestSegments[2], data.Color, ipColumnHeight, destIp3Dic, dest3Ips, 2, destIpNode);
+                AddSegment(data.DestSegments[3], data.Color, ipColumnHeight, destIp4Dic, dest4Ips, destIpNode, destIpToPortLinks);
 
                 nodes.Add(new IpFlowNode()
                 {
@@ -244,12 +262,20 @@ namespace Kant.Wpf.Controls.Chart
 
             #region links
 
-            foreach (var data in ipDatas)
+            CalculateSegment4VerticalPosition(src4Ips);
+            CalculateSegment4VerticalPosition(dest4Ips);
+
+            foreach (var link in srcIpToPortLinks)
             {
-                AddLink(data.SrcIpSegments[3], data.SourcePort, data.DestSegments[3], data.DestinationPort, srcIpToPortLinks, destIpToPortLinks, portLinks, links);
+                SrcIpToPortContainer.Children.Add(ShapeSrcLink(link, SrcIpToPortContainer.ActualWidth).Shape);
             }
 
-            foreach(var node in nodes)
+            foreach (var link in destIpToPortLinks)
+            {
+                DestIpToPortContainer.Children.Add(ShapeDestLink(link, DestIpToPortContainer.ActualWidth).Shape);
+            }
+
+            foreach (var node in nodes)
             {
                 //node.Links = links.Select
             }
@@ -302,16 +328,31 @@ namespace Kant.Wpf.Controls.Chart
 
         #region ip segment node
 
-        private void AddNode(string segment, Brush color, double columnHeight, Dictionary<string, int> ipSegmentDic, List<IpFlowIpSegmentNode> segmentNodes, IpFlowIpNode ipNode, List<IpFlowIpToPortLink> links)
+        private void CalculateSegment4VerticalPosition(List<IpFlowIpSegment4> segments)
         {
-            var findNode = segmentNodes.Find(n => n.Segment == segment);
+           for(var index = 0; index < segments.Count; index++)
+            {
+                if(index == 0)
+                {
+                    segments[index].Y = 0;
+                }
+                else
+                {
+                    segments[index].Y = segments.Take(index).Sum(s => s.Height);
+                }
+            }
+        }
+
+        private void AddSegment(string ipSegment, Brush color, double columnHeight, Dictionary<string, int> ipSegmentDic, List<IpFlowIpSegment4> segments, IpFlowIpNode ipNode, List<IpFlowIpToPortLink> links)
+        {
+            var findNode = segments.Find(n => n.Segment == ipSegment);
 
             if (findNode == null)
             {
-                var node = CreateNode(segment, color, columnHeight, ipSegmentDic, segmentNodes);
-                segmentNodes.Add(node);
-                ipNode.SetSegment(node, 3);
-                CalculateLinkPositionInSegment4Node(node, links);
+                var segment = ConfigureSegment(new IpFlowIpSegment4(), ipSegment, color, columnHeight, ipSegmentDic, segments);
+                segments.Add(segment);
+                ipNode.SetSegment(segment, 3);
+                CalculateLinkPositionInSegment4Node(segment, links);
             }
             else
             {
@@ -319,15 +360,16 @@ namespace Kant.Wpf.Controls.Chart
             }
         }
 
-        private void AddNode(string segment, Brush color, double columnHeight, Dictionary<string, int> ipSegmentDic, List<IpFlowIpSegmentNode> segmentNodes, int index, IpFlowIpNode ipNode)
+        private void AddSegment(string ipSegment, Brush color, double columnHeight, Dictionary<string, int> ipSegmentDic, List<IpFlowIpSegment> segments, int index, IpFlowIpNode ipNode)
         {
-            var findNode = segmentNodes.Find(n => n.Segment == segment);
+            var findNode = segments.Find(n => n.Segment == ipSegment);
 
             if (findNode == null)
             {
-                var node = CreateNode(segment, color, columnHeight, ipSegmentDic, segmentNodes);
-                segmentNodes.Add(node);
-                ipNode.SetSegment(node, index);
+                var segment = ConfigureSegment(new IpFlowIpSegment(), ipSegment, color, columnHeight, ipSegmentDic, segments);
+                segment.IpAddress = ipNode.IpAddress;
+                segments.Add(segment);
+                ipNode.SetSegment(segment, index);
             }
             else
             {
@@ -335,31 +377,16 @@ namespace Kant.Wpf.Controls.Chart
             }
         }
 
-        private IpFlowIpSegmentNode CreateNode(string segment, Brush color, double columnHeight, Dictionary<string, int> ipSegmentDic, List<IpFlowIpSegmentNode> nodes)
+        private TSegment ConfigureSegment<TSegment>(TSegment segment, string ipSegment, Brush color, double columnHeight, Dictionary<string, int> ipSegmentDic, List<TSegment> nodes) where TSegment : IpFlowIpSegment
         {
             var count = ipSegmentDic.Values.Sum();
-            var height = ipSegmentDic[segment] / (double)count * columnHeight;
+            var height = ipSegmentDic[ipSegment] / (double)count * columnHeight;
+            segment.Height = height;
+            segment.Segment = ipSegment;
+            segment.Color = color != null ? color.CloneCurrentValue() : styleManager.SetNodeBrush();
+            segment.OriginalBrush = segment.Color.CloneCurrentValue();
 
-            var node = new IpFlowIpSegmentNode()
-            {
-                Height = height,
-                Segment = segment,
-                Color = color != null ? color.CloneCurrentValue() : styleManager.SetNodeBrush()
-            };
-
-            node.OriginalBrush = node.Color.CloneCurrentValue();
-
-            // calculate y
-            if (nodes.Count > 1)
-            {
-                node.Y = columnHeight + node.Height - nodes.Sum(n => { return n.Height; });
-            }
-            else
-            {
-                node.Y = columnHeight;
-            }
-
-            return node;
+            return segment;
         }
 
         private void BuildCountDictionary<TKey>(TKey key, Dictionary<TKey, int> dictionary)
@@ -399,6 +426,7 @@ namespace Kant.Wpf.Controls.Chart
                 DestIpToPortContainer.Children.Add(label.Label);
             }
         }
+
         /// <summary>
         /// add label 
         /// </summary>
@@ -456,6 +484,7 @@ namespace Kant.Wpf.Controls.Chart
             else if (0 <= port && port < 200)
             {
                 y = (1 - port / 200.0) * halfHeight + halfHeight;
+                y = y - styleManager.LabelAdjustedY;
             }
             else if (200 < port && port <= 60000)
             {
@@ -476,8 +505,6 @@ namespace Kant.Wpf.Controls.Chart
             {
                 return null;
             }
-
-            y = y - styleManager.LabelAdjustedY;
 
             var portLabel = new IpFlowPortLabel()
             {
@@ -520,7 +547,7 @@ namespace Kant.Wpf.Controls.Chart
             {
                 if (portLabel.Port > 200)
                 {
-                    portLabel.Y = (1 - (portLabel.Port / maxPort)) * height - styleManager.LabelAdjustedY;
+                    portLabel.Y = (1 - (portLabel.Port / maxPort)) * height;
                     Canvas.SetBottom(portLabel.Label, portLabel.Y);
                 }
             }
@@ -530,26 +557,8 @@ namespace Kant.Wpf.Controls.Chart
 
         #region link
 
-        private void AddLink(string src4Segment, int srcPort, string dest4Segment, int destPort, List<IpFlowIpToPortLink> srcIpToPortLinks, List<IpFlowIpToPortLink> destIpToPortLinks, List<IpFlowPortLink> portLinks, List<IpFlowLink> links)
+        private IpFlowIpToPortLink ShapeSrcLink(IpFlowIpToPortLink link, double width)
         {
-            var srcIpToPortLink = srcIpToPortLinks.Find(l => l.Segment == src4Segment && l.Port == srcPort);
-            var destIpToPortLink = destIpToPortLinks.Find(l => l.Segment == dest4Segment && l.Port == destPort);
-            var portLink = portLinks.Find(l => l.SourcePort == srcPort && l.DestinationPort == destPort);
-
-            srcIpToPortLink = DrawLink(srcIpToPortLink, SrcIpToPortContainer.ActualWidth);
-            destIpToPortLink = DrawLink(destIpToPortLink, DestIpToPortContainer.ActualWidth);
-            SrcIpToPortContainer.Children.Add(srcIpToPortLink.Shape);
-            DestIpToPortContainer.Children.Add(destIpToPortLink.Shape);
-            //DrawLink(portLink);
-        }
-
-        private IpFlowIpToPortLink DrawLink(IpFlowIpToPortLink link, double width)
-        {
-            if(width <= 0)
-            {
-                return null;
-            };
-
             var startPoint = new Point();
             var line1EndPoint = new Point();
             var bezier1ControlPoint1 = new Point();
@@ -559,8 +568,7 @@ namespace Kant.Wpf.Controls.Chart
             var bezier2ControlPoint2 = new Point();
             bezier2ControlPoint2.Y = startPoint.Y = link.Node.Y + link.PositionInNode;
             bezier1ControlPoint1.Y = line1EndPoint.Y = startPoint.Y + link.Width;
-            bezier2ControlPoint1.Y = link.PositionInPorts;
-            bezier1ControlPoint2.Y = bezier1EndPoint.Y = link.Width;
+            bezier1ControlPoint2.Y = bezier1EndPoint.Y = bezier2ControlPoint1.Y = link.PositionInPorts;
             bezier1EndPoint.X = width;
             bezier2ControlPoint2.X = bezier1ControlPoint1.X = diagram.IpToPortLinkCurvature * width + startPoint.X;
             bezier2ControlPoint1.X = bezier1ControlPoint2.X = (1 - diagram.IpToPortLinkCurvature) * width + startPoint.X;
@@ -576,20 +584,21 @@ namespace Kant.Wpf.Controls.Chart
                         Segments = new PathSegmentCollection()
                         {
                             new LineSegment() { Point = line1EndPoint },
+                            new LineSegment() { Point = bezier1EndPoint },
+                            new LineSegment() { Point = startPoint },
 
-                            new BezierSegment()
-                            {
-                                Point1 = bezier1ControlPoint1,
-                                Point2 = bezier1ControlPoint2,
-                                Point3 = bezier1EndPoint
-                            },
-
-                            new BezierSegment()
-                            {
-                                Point1 = bezier2ControlPoint1,
-                                Point2 = bezier2ControlPoint2,
-                                Point3 = startPoint
-                            }
+                            //new BezierSegment()
+                            //{
+                            //    Point1 = bezier1ControlPoint1,
+                            //    Point2 = bezier1ControlPoint2,
+                            //    Point3 = bezier1EndPoint
+                            //},
+                            //new BezierSegment()
+                            //{
+                            //    Point1 = bezier2ControlPoint1,
+                            //    Point2 = bezier2ControlPoint2,
+                            //    Point3 = startPoint
+                            //}
                         }
                     },
                 }
@@ -601,12 +610,71 @@ namespace Kant.Wpf.Controls.Chart
             return link;
         }
 
-        private void DrawLink(IpFlowPortLink link)
+        private IpFlowIpToPortLink ShapeDestLink(IpFlowIpToPortLink link, double width)
         {
+            var startPoint = new Point();
+            var line1EndPoint = new Point();
+            var bezier1ControlPoint1 = new Point();
+            var bezier1ControlPoint2 = new Point();
+            var bezier1EndPoint = new Point();
+            var bezier2ControlPoint1 = new Point();
+            var bezier2ControlPoint2 = new Point();
+            bezier2ControlPoint2.Y = bezier1ControlPoint1.Y = startPoint.Y = link.PositionInPorts;
+            bezier1EndPoint.Y = bezier1ControlPoint2.Y = link.Node.Y + link.PositionInNode;
+            bezier2ControlPoint1.Y = line1EndPoint.Y = bezier1ControlPoint2.Y + link.Width;
+            line1EndPoint.X = bezier1EndPoint.X = width;
 
+            //bezier2ControlPoint2.Y = startPoint.Y = link.Node.Y + link.PositionInNode;
+            //bezier1ControlPoint1.Y = line1EndPoint.Y = startPoint.Y + link.Width;
+            //bezier2ControlPoint1.Y = link.PositionInPorts;
+            //bezier1ControlPoint2.Y = bezier1EndPoint.Y = link.Width;
+            //bezier1EndPoint.X = width;
+            //bezier2ControlPoint2.X = bezier1ControlPoint1.X = diagram.IpToPortLinkCurvature * width + startPoint.X;
+            //bezier2ControlPoint1.X = bezier1ControlPoint2.X = (1 - diagram.IpToPortLinkCurvature) * width + startPoint.X;
+
+            var geometry = new PathGeometry()
+            {
+                Figures = new PathFigureCollection()
+                {
+                    new PathFigure()
+                    {
+                        StartPoint = startPoint,
+
+                        Segments = new PathSegmentCollection()
+                        {
+                            new LineSegment() { Point = bezier1EndPoint },
+                            new LineSegment() { Point = line1EndPoint },
+                            new LineSegment() { Point = startPoint },
+
+                            //new BezierSegment()
+                            //{
+                            //    Point1 = bezier1ControlPoint1,
+                            //    Point2 = bezier1ControlPoint2,
+                            //    Point3 = bezier1EndPoint
+                            //},
+                            //new BezierSegment()
+                            //{
+                            //    Point1 = bezier2ControlPoint1,
+                            //    Point2 = bezier2ControlPoint2,
+                            //    Point3 = startPoint
+                            //}
+                        }
+                    },
+                }
+            };
+
+            link.Shape.Data = geometry;
+            Panel.SetZIndex(link.Shape, -1);
+
+            return link;
         }
 
-        private void CalculateLinkPositionInSegment4Node(IpFlowIpSegmentNode node, List<IpFlowIpToPortLink> links)
+        private IpFlowPortLink ShapePortLink(IpFlowPortLink link, double width)
+        {
+            return null;
+        }
+
+        private void CalculateLinkPositionInSegment4Node(IpFlowIpSegment4 node, List<IpFlowIpToPortLink> links)
         {
             var segmentLinks = links.FindAll(l => l.Segment == node.Segment).ToList();
             var sumCount = segmentLinks.Sum(l => { return l.Count; });
@@ -621,13 +689,8 @@ namespace Kant.Wpf.Controls.Chart
             }
         }
 
-        private IpFlowIpToPortLink CreateLink(int port, string segment)
+        private IpFlowIpToPortLink CreateLink(int port, string segment, Brush fillBrush, Brush strokeBrush)
         {
-            var fillBrush = diagram.LinkBrush.CloneCurrentValue();
-            fillBrush.Opacity = styleManager.LinkFillOpacity;
-            var strokeBrush = diagram.LinkBrush.CloneCurrentValue();
-            strokeBrush.Opacity = styleManager.LinkStrokeOpacity;
-
             var shape = new Path()
             {
                 Fill = fillBrush,
@@ -642,11 +705,17 @@ namespace Kant.Wpf.Controls.Chart
             };
         }
 
-        private IpFlowPortLink CreateLink(int srcPort, int destPort)
+        private IpFlowPortLink CreateLink(int srcPort, int destPort, Brush fillBrush, Brush strokeBrush)
         {
+            var shape = new Path()
+            {
+                Fill = fillBrush,
+                Stroke = strokeBrush
+            };
+
             return new IpFlowPortLink()
             {
-                Shape = new Path() { Fill = diagram.LinkBrush.CloneCurrentValue() },
+                Shape = shape,
                 SourcePort = srcPort,
                 DestinationPort = destPort
             };
@@ -718,24 +787,28 @@ namespace Kant.Wpf.Controls.Chart
             }
         }
 
-        private void BuildLinks<TItem>(TItem link, List<TItem> links, Predicate<TItem> match) where TItem : IpFlowLinkBase
+        private TItem BuildLinks<TItem>(TItem link, List<TItem> links, Predicate<TItem> match) where TItem : IpFlowLinkBase
         {
             var l = links.Find(match);
 
             if(l != null)
             {
                 l.Count++;
+
+                return l;
             }
             else
             {
                 link.Count = 1;
                 links.Add(link);
+
+                return link;
             }
         }
 
         #endregion
 
-        #region node events
+        #region ip segment node events
 
         private void NodeMouseEnter(object sender, MouseEventArgs e)
         {
@@ -797,8 +870,8 @@ namespace Kant.Wpf.Controls.Chart
 
         #region nodes containers sources
 
-        private List<IpFlowIpSegmentNode> srcIpSegment1Nodes;
-        public IReadOnlyList<IpFlowIpSegmentNode> SrcIpSegment1Nodes
+        private List<IpFlowIpSegment> srcIpSegment1Nodes;
+        public IReadOnlyList<IpFlowIpSegment> SrcIpSegment1Nodes
         {
             get
             {
@@ -811,8 +884,8 @@ namespace Kant.Wpf.Controls.Chart
             }
         }
 
-        private List<IpFlowIpSegmentNode> srcIpSegment2Nodes;
-        public IReadOnlyList<IpFlowIpSegmentNode> SrcIpSegment2Nodes
+        private List<IpFlowIpSegment> srcIpSegment2Nodes;
+        public IReadOnlyList<IpFlowIpSegment> SrcIpSegment2Nodes
         {
             get
             {
@@ -825,8 +898,8 @@ namespace Kant.Wpf.Controls.Chart
             }
         }
 
-        private List<IpFlowIpSegmentNode> srcIpSegment3Nodes;
-        public IReadOnlyList<IpFlowIpSegmentNode> SrcIpSegment3Nodes
+        private List<IpFlowIpSegment> srcIpSegment3Nodes;
+        public IReadOnlyList<IpFlowIpSegment> SrcIpSegment3Nodes
         {
             get
             {
@@ -839,8 +912,8 @@ namespace Kant.Wpf.Controls.Chart
             }
         }
 
-        private List<IpFlowIpSegmentNode> srcIpSegment4Nodes;
-        public IReadOnlyList<IpFlowIpSegmentNode> SrcIpSegment4Nodes
+        private List<IpFlowIpSegment4> srcIpSegment4Nodes;
+        public IReadOnlyList<IpFlowIpSegment4> SrcIpSegment4Nodes
         {
             get
             {
@@ -853,8 +926,8 @@ namespace Kant.Wpf.Controls.Chart
             }
         }
 
-        private List<IpFlowIpSegmentNode> destIpSegment1Nodes;
-        public IReadOnlyList<IpFlowIpSegmentNode> DestIpSegment1Nodes
+        private List<IpFlowIpSegment> destIpSegment1Nodes;
+        public IReadOnlyList<IpFlowIpSegment> DestIpSegment1Nodes
         {
             get
             {
@@ -867,8 +940,8 @@ namespace Kant.Wpf.Controls.Chart
             }
         }
 
-        private List<IpFlowIpSegmentNode> destIpSegment2Nodes;
-        public IReadOnlyList<IpFlowIpSegmentNode> DestIpSegment2Nodes
+        private List<IpFlowIpSegment> destIpSegment2Nodes;
+        public IReadOnlyList<IpFlowIpSegment> DestIpSegment2Nodes
         {
             get
             {
@@ -881,8 +954,8 @@ namespace Kant.Wpf.Controls.Chart
             }
         }
 
-        private List<IpFlowIpSegmentNode> destIpSegment3Nodes;
-        public IReadOnlyList<IpFlowIpSegmentNode> DestIpSegment3Nodes
+        private List<IpFlowIpSegment> destIpSegment3Nodes;
+        public IReadOnlyList<IpFlowIpSegment> DestIpSegment3Nodes
         {
             get
             {
@@ -895,8 +968,8 @@ namespace Kant.Wpf.Controls.Chart
             }
         }
 
-        private List<IpFlowIpSegmentNode> destIpSegment4Nodes;
-        public IReadOnlyList<IpFlowIpSegmentNode> DestIpSegment4Nodes
+        private List<IpFlowIpSegment4> destIpSegment4Nodes;
+        public IReadOnlyList<IpFlowIpSegment4> DestIpSegment4Nodes
         {
             get
             {

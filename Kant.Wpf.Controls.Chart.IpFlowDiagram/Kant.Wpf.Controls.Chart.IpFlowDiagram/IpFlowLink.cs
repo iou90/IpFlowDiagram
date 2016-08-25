@@ -20,6 +20,8 @@ namespace Kant.Wpf.Controls.Chart
 
         public IpFlowPortLink SrcToDestPortLink { get; set; }
 
-        public Brush OriginalBrush { get; set; }
+        public Brush OriginalLinkFillBrush { get; set; }
+
+        public Brush OriginalLinkStrokeBrush { get; set; }
     }
 }

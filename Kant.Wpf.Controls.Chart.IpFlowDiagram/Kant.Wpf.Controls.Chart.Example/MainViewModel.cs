@@ -47,8 +47,8 @@ namespace Kant.Wpf.Controls.Chart.Example
                 });
             }
 
-            datas[0].SourcePort = 0;
-            datas[1].DestinationPort = 65535;
+            //datas[0].SourcePort = 0;
+            //datas[1].DestinationPort = 65535;
             Datas = datas;
             BubbleBrushes = new Dictionary<string, Brush>() { { "word1", bubbleColor } };
         }

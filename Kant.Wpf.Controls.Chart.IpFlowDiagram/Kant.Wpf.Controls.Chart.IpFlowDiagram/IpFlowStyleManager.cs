@@ -33,15 +33,15 @@ namespace Kant.Wpf.Controls.Chart
             diagram.GraphElementBorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#bbbbbb"));
             diagram.HighlightOpacity = 1.0;
             diagram.LoweredOpacity = 0.25;
-            LinkFillOpacity = 0.25;
-            LinkStrokeOpacity = 0.75;
+            LinkFillOpacity = 0.15;
+            LinkStrokeOpacity = 0.45;
         }
 
         public void UpdateLabelAdjustY()
         {
             if (diagram.LabelStyle != null)
             {
-               LabelAdjustedY = MeasureHepler.MeasureString("5", diagram.LabelStyle, CultureInfo.CurrentCulture).Height / 2;
+               LabelAdjustedY = MeasureHepler.MeasureString("5", diagram.LabelStyle, CultureInfo.CurrentCulture).Height;
             }
         }
 
