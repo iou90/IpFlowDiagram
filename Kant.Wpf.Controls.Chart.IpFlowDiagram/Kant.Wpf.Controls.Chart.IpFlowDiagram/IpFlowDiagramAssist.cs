@@ -267,11 +267,13 @@ namespace Kant.Wpf.Controls.Chart
 
             foreach (var link in srcIpToPortLinks)
             {
+                // cal y
                 SrcIpToPortContainer.Children.Add(ShapeSrcLink(link, SrcIpToPortContainer.ActualWidth).Shape);
             }
 
             foreach (var link in destIpToPortLinks)
             {
+                // cal y
                 DestIpToPortContainer.Children.Add(ShapeDestLink(link, DestIpToPortContainer.ActualWidth).Shape);
             }
 
@@ -408,7 +410,6 @@ namespace Kant.Wpf.Controls.Chart
         private void AddSrcPortLabel(int port, List<IpFlowPortLabel> labels, List<IpFlowIpToPortLink> links, List<IpFlowPortLink> portLinks)
         {
             var label = CreateSrcPortLabel(port);
-            CalculateLinkPositionInSrcPorts(port, label, links, portLinks);
 
             if (AddPortLabel(label, labels))
             {
@@ -419,7 +420,6 @@ namespace Kant.Wpf.Controls.Chart
         private void AddDestPortLabel(int port, List<IpFlowPortLabel> labels, List<IpFlowIpToPortLink> links, List<IpFlowPortLink> portLinks)
         {
             var label = CreateDestPortLabel(port);
-            CalculateLinkPositionInDestPorts(port, label, links, portLinks);
 
             if (AddPortLabel(label, labels))
             {
