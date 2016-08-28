@@ -122,7 +122,7 @@ namespace Kant.Wpf.Controls.Chart
                 return;
             }
 
-            if (DiagramGrid.ActualHeight <= 0 || (DiagramGrid.ActualWidth - 5 - diagram.IpSegmentColumnWidth * 8) <= 0)
+            if (DiagramGrid.ActualHeight <= 5 || (DiagramGrid.ActualWidth - 5 - diagram.IpSegmentColumnWidth * 8) <= 0)
             {
                 return;
             }
@@ -132,7 +132,7 @@ namespace Kant.Wpf.Controls.Chart
                 return;
             }
 
-            if (diagram.IpToPortLinkCurvature < 0 || diagram.IpToPortLinkCurvature > 1)
+            if (diagram.LinkCurvature < 0 || diagram.LinkCurvature > 1)
             {
                 throw new ArgumentOutOfRangeException("curvature should be ranged from 0 to 1");
             }
@@ -259,15 +259,16 @@ namespace Kant.Wpf.Controls.Chart
 
             CalculateSegment4VerticalPosition(src4Ips);
             CalculateSegment4VerticalPosition(dest4Ips);
+            CalculatePortLinkWidth(SrcToDestPortContainer.ActualHeight, portLinks);
 
             foreach(var label in srcPortLabels)
             {
-                CalculateLinkPositionInPorts(SrcIpToPortContainer.ActualHeight / 2, label, srcIpToPortLinks, portLinks, l => l.SourcePort == label.Port && !l.PositionInPortIsSetted, l => 200 < l.SourcePort && l.SourcePort <= label.Port && !l.PositionInPortIsSetted, SetPortLinkPositionInSrcPortLessThan200, SetPortLinkPositionInSrcPortGreaterThan200);
+                CalculateLinkPositionInPorts(SrcIpToPortContainer.ActualHeight / 2, label, srcIpToPortLinks, portLinks, l => l.SourcePort == label.Port && !l.PositionInSourcePortsIsSetted, l => 200 < l.SourcePort && l.SourcePort <= label.Port && !l.PositionInSourcePortsIsSetted, SetPortLinkPositionInSrcPortLessThan200, SetPortLinkPositionInSrcPortGreaterThan200);
             }
 
             foreach(var label in destPortLabels)
             {
-                CalculateLinkPositionInPorts(DestIpToPortContainer.ActualHeight / 2, label, destIpToPortLinks, portLinks, l => l.SourcePort == label.Port && !l.PositionInPortIsSetted, l => 200 < l.SourcePort && l.SourcePort <= label.Port && !l.PositionInPortIsSetted, SetPortLinkPositionInSrcPortLessThan200, SetPortLinkPositionInSrcPortGreaterThan200);
+                CalculateLinkPositionInPorts(DestIpToPortContainer.ActualHeight / 2, label, destIpToPortLinks, portLinks, l => l.DestinationPort == label.Port && !l.PositionInDestinationPortsIsSetted, l => 200 < l.DestinationPort && l.DestinationPort <= label.Port && !l.PositionInDestinationPortsIsSetted, SetPortLinkPositionInDestPortLessThan200, SetPortLinkPositionInDestPortGreaterThan200);
             }
 
             foreach (var link in srcIpToPortLinks)
@@ -278,6 +279,11 @@ namespace Kant.Wpf.Controls.Chart
             foreach (var link in destIpToPortLinks)
             {
                 DestIpToPortContainer.Children.Add(ShapeDestLink(link, DestIpToPortContainer.ActualWidth).Shape);
+            }
+
+            foreach(var link in portLinks)
+            {
+                SrcToDestPortContainer.Children.Add(ShapePortLink(link, SrcToDestPortContainer.ActualWidth).Shape);
             }
 
             foreach (var node in nodes)
@@ -591,8 +597,8 @@ namespace Kant.Wpf.Controls.Chart
             bezier1ControlPoint1.Y = line1EndPoint.Y = startPoint.Y + link.Width;
             bezier1ControlPoint2.Y = bezier1EndPoint.Y = bezier2ControlPoint1.Y = link.PositionInPorts;
             bezier1EndPoint.X = width;
-            bezier2ControlPoint2.X = bezier1ControlPoint1.X = diagram.IpToPortLinkCurvature * width + startPoint.X;
-            bezier2ControlPoint1.X = bezier1ControlPoint2.X = (1 - diagram.IpToPortLinkCurvature) * width + startPoint.X;
+            bezier2ControlPoint2.X = bezier1ControlPoint1.X = diagram.LinkCurvature * width;
+            bezier2ControlPoint1.X = bezier1ControlPoint2.X = (1 - diagram.LinkCurvature) * width;
 
             var geometry = new PathGeometry()
             {
@@ -643,8 +649,8 @@ namespace Kant.Wpf.Controls.Chart
             bezier1ControlPoint2.Y = bezier1EndPoint.Y = link.Node.Y + link.PositionInNode;
             bezier2ControlPoint1.Y = line1EndPoint.Y = bezier1EndPoint.Y + link.Width;
             line1EndPoint.X = bezier1EndPoint.X = width;
-            bezier2ControlPoint2.X = bezier1ControlPoint1.X = diagram.IpToPortLinkCurvature * width + startPoint.X;
-            bezier2ControlPoint1.X = bezier1ControlPoint2.X = (1 - diagram.IpToPortLinkCurvature) * width + startPoint.X;
+            bezier2ControlPoint2.X = bezier1ControlPoint1.X = diagram.LinkCurvature * width;
+            bezier2ControlPoint1.X = bezier1ControlPoint2.X = (1 - diagram.LinkCurvature) * width;
 
             var geometry = new PathGeometry()
             {
@@ -684,7 +690,147 @@ namespace Kant.Wpf.Controls.Chart
 
         private IpFlowPortLink ShapePortLink(IpFlowPortLink link, double width)
         {
-            return null;
+            var startPoint = new Point();
+            var bezier1ControlPoint1 = new Point();
+            var bezier2ControlPoint2 = new Point();
+            var bezier2EndPoint = new Point();
+            var figure1Bezier1ControlPoint2 = new Point();
+            var figure1Bezier1EndPoint = new Point();
+            var figure1Bezier2ControlPoint1 = new Point();
+            var figure2Bezier1ControlPoint2 = new Point();
+            var figure2Bezier1EndPoint = new Point();
+            var figure2Bezier2ControlPoint1 = new Point();
+            var midX = width / 2;
+
+            if (link.SourcePort == link.DestinationPort)
+            {
+                figure1Bezier2ControlPoint1.Y = figure1Bezier1EndPoint.Y = figure1Bezier1ControlPoint2.Y = link.Depth;
+                figure2Bezier2ControlPoint1.Y = figure2Bezier1EndPoint.Y = figure2Bezier1ControlPoint2.Y = link.Depth + link.Width;;
+            }
+            else
+            {
+                var midY = (link.PositionInSourcePorts + link.PositionInDestinationPorts) / 2;
+                figure1Bezier2ControlPoint1.Y = figure1Bezier1EndPoint.Y = figure1Bezier1ControlPoint2.Y = midY;
+                figure2Bezier2ControlPoint1.Y = figure2Bezier1EndPoint.Y = figure2Bezier1ControlPoint2.Y = midY + link.Width;
+            }
+
+            bezier1ControlPoint1.Y = startPoint.Y = link.PositionInSourcePorts;
+            bezier2ControlPoint2.Y = bezier2EndPoint.Y = link.PositionInDestinationPorts;
+            figure1Bezier1EndPoint.X = figure2Bezier1EndPoint.X = midX;
+            bezier2EndPoint.X = width;
+            bezier1ControlPoint1.X = midX * diagram.LinkCurvature;
+            figure2Bezier1ControlPoint2.X = figure1Bezier1ControlPoint2.X = midX * (1 - diagram.LinkCurvature);
+            figure2Bezier2ControlPoint1.X = figure1Bezier2ControlPoint1.X = midX * (1 + diagram.LinkCurvature);
+            bezier2ControlPoint2.X = midX * (1 + (1 - diagram.LinkCurvature));
+
+            var geometry = new PathGeometry()
+            {
+                Figures = new PathFigureCollection()
+                    {
+                        new PathFigure()
+                        {
+                            StartPoint = startPoint,
+
+                            Segments = new PathSegmentCollection()
+                            {
+                                new BezierSegment()
+                                {
+                                    Point1 = bezier1ControlPoint1,
+                                    Point2 = figure1Bezier1ControlPoint2,
+                                    Point3 = figure1Bezier1EndPoint
+                                },
+
+                                new BezierSegment()
+                                {
+                                    Point1 = figure1Bezier2ControlPoint1,
+                                    Point2 = bezier2ControlPoint2,
+                                    Point3 = bezier2EndPoint
+                                }
+                            }
+                        },
+
+                        new PathFigure()
+                        {
+                            StartPoint = startPoint,
+
+                            Segments = new PathSegmentCollection()
+                            {
+                                new BezierSegment()
+                                {
+                                    Point1 = bezier1ControlPoint1,
+                                    Point2 = figure2Bezier1ControlPoint2,
+                                    Point3 = figure2Bezier1EndPoint
+                                },
+
+                                new BezierSegment()
+                                {
+                                    Point1 = figure2Bezier2ControlPoint1,
+                                    Point2 = bezier2ControlPoint2,
+                                    Point3 = bezier2EndPoint
+                                }
+                            }
+                        }
+                    }
+            };
+
+            link.Shape.Data = geometry;
+            Panel.SetZIndex(link.Shape, -1);
+
+            return link;
+        }
+
+        private void CalculatePortLinkWidth(double height, List<IpFlowPortLink> links)
+        {
+            #region calculate width
+
+            var sumCount = links.Sum(l => { return l.Count; });
+
+            if (sumCount <= height)
+            {
+                foreach(var link in links)
+                {
+                    link.Width = link.Count;
+                }
+            }
+            else
+            {
+                foreach (var link in links)
+                {
+                    link.Width = height * link.Count / sumCount;
+                }
+            }
+
+            #endregion
+
+            #region calculate link depth if it's source port equals destination port
+
+            var equalPortLinks = new List<IpFlowPortLink>();
+
+            foreach (var link in links)
+            {
+                if(link.SourcePort == link.DestinationPort)
+                {
+                    equalPortLinks.Add(link);
+                }
+            }
+
+            if(equalPortLinks.Count == 0)
+            {
+                return;
+            }
+
+            var halfHeihgt = height / 2;
+            var sumWidths = links.Sum(l => { return l.Width; });
+            var depth = sumWidths >= halfHeihgt ? height : halfHeihgt - sumWidths;
+
+            // from 0 to 65535
+            foreach(var link in equalPortLinks.OrderBy(l => l.SourcePort))
+            {
+                link.Depth = depth;
+                depth += link.Width;
+            }
+
+            #endregion
         }
 
         private void CalculateLinkPositionInSegment4Node(IpFlowIpSegment4 node, List<IpFlowIpToPortLink> links)
@@ -773,25 +919,25 @@ namespace Kant.Wpf.Controls.Chart
         private  void SetPortLinkPositionInSrcPortLessThan200(IpFlowPortLink link, IpFlowPortLabel label)
         {
             link.PositionInSourcePorts = label.Y;
-            link.PositionInPortIsSetted = true;
+            link.PositionInSourcePortsIsSetted = true;
         }
 
         private void SetPortLinkPositionInDestPortLessThan200(IpFlowPortLink link, IpFlowPortLabel label)
         {
             link.PositionInDestinationPorts = label.Y;
-            link.PositionInPortIsSetted = true;
+            link.PositionInDestinationPortsIsSetted = true;
         }
 
         private void SetPortLinkPositionInSrcPortGreaterThan200(double height, IpFlowPortLink link, IpFlowPortLabel label)
         {
             link.PositionInSourcePorts = ((double)link.SourcePort / label.Port) * (label.Y + styleManager.LabelAdjustedY - height) + height;
-            link.PositionInPortIsSetted = true;
+            link.PositionInSourcePortsIsSetted = true;
         }
 
         private void SetPortLinkPositionInDestPortGreaterThan200(double height, IpFlowPortLink link, IpFlowPortLabel label)
         {
             link.PositionInDestinationPorts = ((double)link.DestinationPort / label.Port) * (label.Y + styleManager.LabelAdjustedY - height) + height;
-            link.PositionInPortIsSetted = true;
+            link.PositionInDestinationPortsIsSetted = true;
         }
 
         private TItem BuildLinks<TItem>(TItem link, List<TItem> links, Predicate<TItem> match) where TItem : IpFlowLinkBase

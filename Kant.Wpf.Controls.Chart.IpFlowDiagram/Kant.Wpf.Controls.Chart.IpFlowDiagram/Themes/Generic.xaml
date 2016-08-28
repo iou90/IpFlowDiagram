@@ -81,8 +81,7 @@
                                 Width="1"
                                 Grid.Column="5" />
                         <Canvas x:Name="PartSrcToDestPort"
-                                Grid.Column="6"
-                                ClipToBounds="True" />
+                                Grid.Column="6" />
                         <Border Background="{Binding GraphElementBorderBrush, RelativeSource={RelativeSource AncestorType=local:IpFlowDiagram}}"
                                 Width="1"
                                 Grid.Column="7" />

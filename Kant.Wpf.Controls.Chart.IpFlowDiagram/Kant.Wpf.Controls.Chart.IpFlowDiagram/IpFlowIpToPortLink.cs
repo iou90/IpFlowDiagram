@@ -19,10 +19,10 @@ namespace Kant.Wpf.Controls.Chart
 
         public int Port { get; set; }
 
-        public double Width { get; set; }
-
         public double PositionInNode { get; set; }
 
         public double PositionInPorts { get; set; }
+
+        public bool PositionInPortIsSetted { get; set; }
     }
 }

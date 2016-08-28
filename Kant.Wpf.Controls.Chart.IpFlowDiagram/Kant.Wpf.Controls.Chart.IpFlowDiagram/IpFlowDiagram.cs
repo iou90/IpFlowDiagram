@@ -247,7 +247,7 @@ namespace Kant.Wpf.Controls.Chart
         /// <summary>
         /// 0.55 by default, ranged from 0 to 1
         /// </summary>
-        public double IpToPortLinkCurvature { get; set; }
+        public double LinkCurvature { get; set; }
 
         /// <summary>
         /// apply to nodes, links

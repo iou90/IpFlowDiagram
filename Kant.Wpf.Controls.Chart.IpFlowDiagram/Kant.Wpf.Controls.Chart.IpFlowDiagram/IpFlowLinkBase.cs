@@ -13,6 +13,6 @@ namespace Kant.Wpf.Controls.Chart
 
         public int Count { get; set; }
 
-        public bool PositionInPortIsSetted { get; set; }
+        public double Width { get; set; }
     }
 }

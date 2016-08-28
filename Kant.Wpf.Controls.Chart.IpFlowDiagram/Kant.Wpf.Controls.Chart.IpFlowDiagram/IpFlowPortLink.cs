@@ -12,6 +12,8 @@ namespace Kant.Wpf.Controls.Chart
         {
         }
 
+        public double Depth { get; set; }
+
         public int SourcePort { get; set; }
 
         public int DestinationPort { get; set; }
@@ -19,5 +21,9 @@ namespace Kant.Wpf.Controls.Chart
         public double PositionInSourcePorts { get; set; }
 
         public double PositionInDestinationPorts { get; set; }
+
+        public bool PositionInSourcePortsIsSetted { get; set; }
+
+        public bool PositionInDestinationPortsIsSetted { get; set; }
     }
 }

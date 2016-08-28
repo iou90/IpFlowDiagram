@@ -34,14 +34,31 @@ namespace Kant.Wpf.Controls.Chart.Example
 
             for(var index = 0; index < count; index++)
             {
+                var port = random.Next(55, 57);
+
                 datas.Add(new IpFlowData()
                 {
                     //SourceIp = "192.168.1." + random.Next(1, 255).ToString(),
                     //DestinationIp = "10.0.0." + random.Next(1, 255).ToString(),
                     //DestinationPort = random.Next(0, 200),
-                    DestinationPort = random.Next(0, 2) == 1 ? 155 : 55555,
+                    //DestinationPort = random.Next(0, 2) == 1 ? 155 : 55555,
                     //SourcePort = random.Next(0, 200),
-                    SourcePort = random.Next(0, 2) == 1 ? 55 : 25555,
+                    //SourcePort = random.Next(0, 2) == 1 ? 55 : 25555,
+                    SourcePort = port,
+                    DestinationPort = port,
+                    SourceIp = "192.168.1." + random.Next(1, 5),
+                    DestinationIp = "10.0.0." + random.Next(1, 5)
+                });
+            }
+
+            for (var index = count; index < count + count; index++)
+            {
+                var port = random.Next(45555, 45560);
+
+                datas.Add(new IpFlowData()
+                {
+                    SourcePort = port,
+                    DestinationPort = port,
                     SourceIp = "192.168.1." + random.Next(1, 5),
                     DestinationIp = "10.0.0." + random.Next(1, 5)
                 });
@@ -54,7 +71,12 @@ namespace Kant.Wpf.Controls.Chart.Example
             datas[3].SourcePort = 50000;
             datas[4].SourcePort = 40000;
             datas[5].SourcePort = 20000;
-            datas[6].SourcePort = 10000;
+            //datas[6].DestinationPort = datas[6].SourcePort = 10;
+            //datas[7].DestinationPort = datas[7].SourcePort = 60;
+            //datas[8].DestinationPort = datas[8].SourcePort = 50;
+            //datas[9].DestinationPort = datas[9].SourcePort = 40;
+            //datas[10].DestinationPort = datas[10].SourcePort = 20;
+            //datas[11].DestinationPort = datas[11].SourcePort = 100;
             Datas = datas;
             BubbleBrushes = new Dictionary<string, Brush>() { { "word1", bubbleColor } };
         }
