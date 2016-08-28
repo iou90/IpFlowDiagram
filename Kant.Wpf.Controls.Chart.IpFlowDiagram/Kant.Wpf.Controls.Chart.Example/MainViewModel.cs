@@ -38,17 +38,23 @@ namespace Kant.Wpf.Controls.Chart.Example
                 {
                     //SourceIp = "192.168.1." + random.Next(1, 255).ToString(),
                     //DestinationIp = "10.0.0." + random.Next(1, 255).ToString(),
-                    //DestinationPort = random.Next(0, 65535),
+                    //DestinationPort = random.Next(0, 200),
                     DestinationPort = random.Next(0, 2) == 1 ? 155 : 55555,
-                    //SourcePort = random.Next(0, 65535),
+                    //SourcePort = random.Next(0, 200),
                     SourcePort = random.Next(0, 2) == 1 ? 55 : 25555,
                     SourceIp = "192.168.1." + random.Next(1, 5),
                     DestinationIp = "10.0.0." + random.Next(1, 5)
                 });
             }
 
-            //datas[0].SourcePort = 0;
-            //datas[1].DestinationPort = 65535;
+            datas[0].DestinationPort = 0;
+            datas[1].DestinationPort = 199;
+            datas[1].SourcePort = 65535;
+            datas[2].SourcePort = 60000;
+            datas[3].SourcePort = 50000;
+            datas[4].SourcePort = 40000;
+            datas[5].SourcePort = 20000;
+            datas[6].SourcePort = 10000;
             Datas = datas;
             BubbleBrushes = new Dictionary<string, Brush>() { { "word1", bubbleColor } };
         }

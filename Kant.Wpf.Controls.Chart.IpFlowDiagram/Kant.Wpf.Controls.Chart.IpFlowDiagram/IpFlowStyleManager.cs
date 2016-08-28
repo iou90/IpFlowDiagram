@@ -30,6 +30,7 @@ namespace Kant.Wpf.Controls.Chart
             diagram.LinkBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#9ceaff"));
             diagram.IpSegmentColumnWidth = 25.0;
             diagram.MaxDisplayIpCount = 10;
+            diagram.IpToPortLinkCurvature = 0.55;
             diagram.GraphElementBorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#bbbbbb"));
             diagram.HighlightOpacity = 1.0;
             diagram.LoweredOpacity = 0.25;

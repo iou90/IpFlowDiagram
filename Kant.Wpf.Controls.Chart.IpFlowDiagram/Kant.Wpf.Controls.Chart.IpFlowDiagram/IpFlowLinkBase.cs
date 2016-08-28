@@ -12,5 +12,7 @@ namespace Kant.Wpf.Controls.Chart
         public Path Shape { get; set; }
 
         public int Count { get; set; }
+
+        public bool PositionInPortIsSetted { get; set; }
     }
 }
