@@ -73,18 +73,24 @@ namespace Kant.Wpf.Controls.Chart
 
         public void ClearDiagram()
         {
-            ClearDatas(nodes);
-            ClearDatas(srcIpSegment1Nodes);
-            ClearDatas(srcIpSegment2Nodes);
-            ClearDatas(srcIpSegment3Nodes);
-            ClearDatas(srcIpSegment4Nodes);
-            ClearDatas(destIpSegment1Nodes);
-            ClearDatas(destIpSegment2Nodes);
-            ClearDatas(destIpSegment3Nodes);
-            ClearDatas(destIpSegment4Nodes);
-            ClearDatas(srcPortLabels);
-            ClearDatas(destPortLabels);
+            filteredDatas = null;
+            nodes = null;
+            srcPortLabels = null;
+            destPortLabels = null;
+            SrcIpSegment1Nodes = null;
+            SrcIpSegment2Nodes = null;
+            SrcIpSegment3Nodes = null;
+            SrcIpSegment4Nodes = null;
+            DestIpSegment1Nodes = null;
+            DestIpSegment2Nodes = null;
+            DestIpSegment3Nodes = null;
+            DestIpSegment4Nodes = null;
             ClearDiagramCanvasChilds();
+
+            if (DiagramGrid != null)
+            {
+                DiagramGrid.Visibility = Visibility.Hidden;
+            }
         }
 
         public void ClearDiagramCanvasChilds()
@@ -102,14 +108,6 @@ namespace Kant.Wpf.Controls.Chart
             if (SrcToDestPortContainer != null && SrcToDestPortContainer.Children != null)
             {
                 SrcToDestPortContainer.Children.Clear();
-            }
-        }
-
-        private void ClearDatas<T>(List<T> datas)
-        {
-            if(datas != null)
-            {
-                datas.Clear();
             }
         }
 
@@ -292,6 +290,8 @@ namespace Kant.Wpf.Controls.Chart
             }
 
             #endregion
+
+            DiagramGrid.Visibility = Visibility.Visible;
         }
 
         private List<IpFlowData> FilterDatas(IEnumerable<IpFlowData> datas)
@@ -1030,7 +1030,7 @@ namespace Kant.Wpf.Controls.Chart
             {
                 return srcIpSegment1Nodes;
             }
-            set
+            private set
             {
                 srcIpSegment1Nodes = value == null ? null : value.ToList();
                 RaisePropertyChanged(() => SrcIpSegment1Nodes);
@@ -1044,7 +1044,7 @@ namespace Kant.Wpf.Controls.Chart
             {
                 return srcIpSegment2Nodes;
             }
-            set
+            private set
             {
                 srcIpSegment2Nodes = value == null ? null : value.ToList();
                 RaisePropertyChanged(() => SrcIpSegment2Nodes);
@@ -1058,7 +1058,7 @@ namespace Kant.Wpf.Controls.Chart
             {
                 return srcIpSegment3Nodes;
             }
-            set
+            private set
             {
                 srcIpSegment3Nodes = value == null ? null : value.ToList();
                 RaisePropertyChanged(() => SrcIpSegment3Nodes);
@@ -1072,7 +1072,7 @@ namespace Kant.Wpf.Controls.Chart
             {
                 return srcIpSegment4Nodes;
             }
-            set
+            private set
             {
                 srcIpSegment4Nodes = value == null ? null : value.ToList();
                 RaisePropertyChanged(() => SrcIpSegment4Nodes);
@@ -1086,7 +1086,7 @@ namespace Kant.Wpf.Controls.Chart
             {
                 return destIpSegment1Nodes;
             }
-            set
+            private set
             {
                 destIpSegment1Nodes = value == null ? null : value.ToList();
                 RaisePropertyChanged(() => DestIpSegment1Nodes);
@@ -1100,7 +1100,7 @@ namespace Kant.Wpf.Controls.Chart
             {
                 return destIpSegment2Nodes;
             }
-            set
+            private set
             {
                 destIpSegment2Nodes = value == null ? null : value.ToList();
                 RaisePropertyChanged(() => DestIpSegment2Nodes);
@@ -1114,7 +1114,7 @@ namespace Kant.Wpf.Controls.Chart
             {
                 return destIpSegment3Nodes;
             }
-            set
+            private set
             {
                 destIpSegment3Nodes = value == null ? null : value.ToList();
                 RaisePropertyChanged(() => DestIpSegment3Nodes);
@@ -1128,7 +1128,7 @@ namespace Kant.Wpf.Controls.Chart
             {
                 return destIpSegment4Nodes;
             }
-            set
+            private set
             {
                 destIpSegment4Nodes = value == null ? null : value.ToList();
                 RaisePropertyChanged(() => DestIpSegment4Nodes);

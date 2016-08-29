@@ -118,6 +118,7 @@ namespace Kant.Wpf.Controls.Chart.Example
             {
                 return GetCommand(clearDiagram, new RelayCommand(() =>
                 {
+                    Datas = null;
                 }));
             }
         }
@@ -172,15 +173,15 @@ namespace Kant.Wpf.Controls.Chart.Example
         #region Fields & Properties
 
         private List<IpFlowData> datas;
-        public List<IpFlowData> Datas
+        public IReadOnlyList<IpFlowData> Datas
         {
             get
             {
                 return datas;
             }
-            set
+            private set
             {
-                datas = value;
+                datas = value == null ? null : value.ToList();
                 RaisePropertyChanged(() => Datas);
             }
         }
