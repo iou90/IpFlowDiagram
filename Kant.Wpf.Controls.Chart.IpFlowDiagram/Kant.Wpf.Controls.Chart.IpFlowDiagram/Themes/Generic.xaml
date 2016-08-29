@@ -4,11 +4,21 @@
                     xmlns:local="clr-namespace:Kant.Wpf.Controls.Chart">
     <Style x:Key="DefaultLabelStyle"
            TargetType="TextBlock">
-        <Setter Property="Margin" Value="1" />
+        <Setter Property="Margin"
+                Value="1" />
+    </Style>
+    <Style x:Key="DefaultLegendLabelStyle"
+           TargetType="TextBlock">
+        <Setter Property="FontSize"
+                Value="15" />
+        <Setter Property="Margin"
+                Value="0,5" />
     </Style>
     <Style TargetType="{x:Type local:IpFlowDiagram}">
-        <Setter Property="LabelStyle"
+        <Setter Property="NodeLabelStyle"
                 Value="{StaticResource DefaultLabelStyle}" />
+        <Setter Property="LegendLabelStyle"
+                Value="{StaticResource DefaultLegendLabelStyle}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:IpFlowDiagram}">
@@ -45,7 +55,7 @@
                                                 <TextBlock HorizontalAlignment="Center"
                                                            VerticalAlignment="Center"
                                                            Text="{Binding Segment}"
-                                                           Style="{Binding LabelStyle, RelativeSource={RelativeSource AncestorType=local:IpFlowDiagram}}" />
+                                                           Style="{Binding NodeLabelStyle, RelativeSource={RelativeSource AncestorType=local:IpFlowDiagram}}" />
                                             </Grid>
                                         </DataTemplate>
                                     </Setter.Value>
@@ -58,15 +68,42 @@
                             <ColumnDefinition Width="auto" />
                             <ColumnDefinition Width="auto" />
                             <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="auto" />
+                            <ColumnDefinition Width="1" />
                             <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="auto" />
+                            <ColumnDefinition Width="1" />
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="auto" />
                             <ColumnDefinition Width="auto" />
                             <ColumnDefinition Width="auto" />
                             <ColumnDefinition Width="auto" />
                         </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="auto" />
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="1"
+                                   Grid.ColumnSpan="4"
+                                   Style="{TemplateBinding LegendLabelStyle}"
+                                   HorizontalAlignment="Center"
+                                   Text="Src IP" />
+                        <TextBlock Grid.Row="1"
+                                   Grid.Column="4"
+                                   Grid.ColumnSpan="3"
+                                   Style="{TemplateBinding LegendLabelStyle}"
+                                   HorizontalAlignment="Center"
+                                   Text="Src Port" />
+                        <TextBlock Grid.Row="1"
+                                   Grid.Column="6"
+                                   Grid.ColumnSpan="3"
+                                   Style="{TemplateBinding LegendLabelStyle}"
+                                   HorizontalAlignment="Center"
+                                   Text="Dest Port" />
+                        <TextBlock Grid.Row="1"
+                                   Grid.Column="9"
+                                   Grid.ColumnSpan="4"
+                                   Style="{TemplateBinding LegendLabelStyle}"
+                                   HorizontalAlignment="Center"
+                                   Text="Dest IP" />
                         <ItemsControl x:Name="PartSrcIpSegment1" />
                         <ItemsControl x:Name="PartSrcIpSegment2"
                                       Grid.Column="1" />
@@ -78,12 +115,10 @@
                                 Grid.Column="4"
                                 ClipToBounds="True" />
                         <Border Background="{Binding GraphElementBorderBrush, RelativeSource={RelativeSource AncestorType=local:IpFlowDiagram}}"
-                                Width="1"
                                 Grid.Column="5" />
                         <Canvas x:Name="PartSrcToDestPort"
                                 Grid.Column="6" />
                         <Border Background="{Binding GraphElementBorderBrush, RelativeSource={RelativeSource AncestorType=local:IpFlowDiagram}}"
-                                Width="1"
                                 Grid.Column="7" />
                         <Canvas x:Name="PartDestIpToPort"
                                 Grid.Column="8"

@@ -40,9 +40,9 @@ namespace Kant.Wpf.Controls.Chart
 
         public void UpdateLabelAdjustY()
         {
-            if (diagram.LabelStyle != null)
+            if (diagram.NodeLabelStyle != null)
             {
-               LabelAdjustedY = MeasureHepler.MeasureString("5", diagram.LabelStyle, CultureInfo.CurrentCulture).Height;
+               LabelAdjustedY = MeasureHepler.MeasureString("5", diagram.NodeLabelStyle, CultureInfo.CurrentCulture).Height;
             }
         }
 

@@ -225,13 +225,21 @@ namespace Kant.Wpf.Controls.Chart
 
         public static readonly DependencyProperty HighlightNodeProperty = DependencyProperty.Register("HighlightNode", typeof(string), typeof(IpFlowDiagram), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, null, HighlightNodeValueCallback));
 
-        public Style LabelStyle
+        public Style NodeLabelStyle
         {
-            get { return (Style)GetValue(LabelStyleProperty); }
-            set { SetValue(LabelStyleProperty, value); }
+            get { return (Style)GetValue(NodeLabelStyleProperty); }
+            set { SetValue(NodeLabelStyleProperty, value); }
         }
 
-        public static readonly DependencyProperty LabelStyleProperty = DependencyProperty.Register("LabelStyle", typeof(Style), typeof(IpFlowDiagram));
+        public static readonly DependencyProperty NodeLabelStyleProperty = DependencyProperty.Register("NodeLabelStyle", typeof(Style), typeof(IpFlowDiagram));
+
+        public Style LegendLabelStyle
+        {
+            get { return (Style)GetValue(LegendLabelStyleProperty); }
+            set { SetValue(LegendLabelStyleProperty, value); }
+        }
+
+        public static readonly DependencyProperty LegendLabelStyleProperty = DependencyProperty.Register("LegendLabelStyle", typeof(Style), typeof(IpFlowDiagram));
 
         #endregion
 

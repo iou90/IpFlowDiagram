@@ -543,9 +543,9 @@ namespace Kant.Wpf.Controls.Chart
                 }
             };
 
-            if (diagram.LabelStyle != null)
+            if (diagram.NodeLabelStyle != null)
             {
-                portLabel.Label.Style = diagram.LabelStyle;
+                portLabel.Label.Style = diagram.NodeLabelStyle;
             }
 
             Canvas.SetTop(portLabel.Label, portLabel.Y);
