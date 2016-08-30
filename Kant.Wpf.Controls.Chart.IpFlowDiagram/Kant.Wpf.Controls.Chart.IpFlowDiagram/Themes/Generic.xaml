@@ -14,6 +14,38 @@
         <Setter Property="Margin"
                 Value="0,5" />
     </Style>
+    <DataTemplate x:Key="SrcSegment4ItemTemplate">
+        <Border BorderThickness="0.5,0.5,0,0.5"
+                BorderBrush="{Binding IpSegmentNodeBorderBrush, RelativeSource={RelativeSource AncestorType=local:IpFlowDiagram}}">
+            <Grid Tag="{Binding IpAddress}">
+                <!--<i:Interaction.Triggers>
+                                                    <i:EventTrigger EventName="MouseLeftButtonUp" 
+                                                </i:Interaction.Triggers>-->
+                <Rectangle Fill="{Binding Color}"
+                           Height="{Binding Height}" />
+                <TextBlock HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           Text="{Binding Segment}"
+                           Style="{Binding NodeLabelStyle, RelativeSource={RelativeSource AncestorType=local:IpFlowDiagram}}" />
+            </Grid>
+        </Border>
+    </DataTemplate>
+    <DataTemplate x:Key="DestSegment4ItemTemplate">
+        <Border BorderThickness="0,0.5,0.5,0.5"
+                BorderBrush="{Binding IpSegmentNodeBorderBrush, RelativeSource={RelativeSource AncestorType=local:IpFlowDiagram}}">
+            <Grid Tag="{Binding IpAddress}">
+                <!--<i:Interaction.Triggers>
+                                                    <i:EventTrigger EventName="MouseLeftButtonUp" 
+                                                </i:Interaction.Triggers>-->
+                <Rectangle Fill="{Binding Color}"
+                           Height="{Binding Height}" />
+                <TextBlock HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           Text="{Binding Segment}"
+                           Style="{Binding NodeLabelStyle, RelativeSource={RelativeSource AncestorType=local:IpFlowDiagram}}" />
+            </Grid>
+        </Border>
+    </DataTemplate>
     <Style TargetType="{x:Type local:IpFlowDiagram}">
         <Setter Property="NodeLabelStyle"
                 Value="{StaticResource DefaultLabelStyle}" />
@@ -29,34 +61,23 @@
                                         Value="True" />
                                 <Setter Property="Width"
                                         Value="{Binding IpSegmentColumnWidth, RelativeSource={RelativeSource AncestorType=local:IpFlowDiagram}}" />
-                                <Setter Property="BorderThickness"
-                                        Value="0.25" />
-                                <Setter Property="BorderBrush"
-                                        Value="{Binding GraphElementBorderBrush, RelativeSource={RelativeSource AncestorType=local:IpFlowDiagram}}" />
-                                <Setter Property="ItemContainerStyle">
-                                    <Setter.Value>
-                                        <Style>
-                                            <Setter Property="Control.BorderThickness"
-                                                    Value="0.5" />
-                                            <Setter Property="Control.BorderBrush"
-                                                    Value="{Binding GraphElementBorderBrush, RelativeSource={RelativeSource AncestorType=local:IpFlowDiagram}}" />
-                                        </Style>
-                                    </Setter.Value>
-                                </Setter>
                                 <Setter Property="ItemTemplate">
                                     <Setter.Value>
                                         <DataTemplate>
-                                            <Grid Tag="{Binding IpAddress}">
-                                                <!--<i:Interaction.Triggers>
+                                            <Border BorderThickness="0.5"
+                                                    BorderBrush="{Binding IpSegmentNodeBorderBrush, RelativeSource={RelativeSource AncestorType=local:IpFlowDiagram}}">
+                                                <Grid Tag="{Binding IpAddress}">
+                                                    <!--<i:Interaction.Triggers>
                                                     <i:EventTrigger EventName="MouseLeftButtonUp" 
                                                 </i:Interaction.Triggers>-->
-                                                <Rectangle Fill="{Binding Color}"
-                                                           Height="{Binding Height}" />
-                                                <TextBlock HorizontalAlignment="Center"
-                                                           VerticalAlignment="Center"
-                                                           Text="{Binding Segment}"
-                                                           Style="{Binding NodeLabelStyle, RelativeSource={RelativeSource AncestorType=local:IpFlowDiagram}}" />
-                                            </Grid>
+                                                    <Rectangle Fill="{Binding Color}"
+                                                               Height="{Binding Height}" />
+                                                    <TextBlock HorizontalAlignment="Center"
+                                                               VerticalAlignment="Center"
+                                                               Text="{Binding Segment}"
+                                                               Style="{Binding NodeLabelStyle, RelativeSource={RelativeSource AncestorType=local:IpFlowDiagram}}" />
+                                                </Grid>
+                                            </Border>
                                         </DataTemplate>
                                     </Setter.Value>
                                 </Setter>
@@ -110,21 +131,23 @@
                         <ItemsControl x:Name="PartSrcIpSegment3"
                                       Grid.Column="2" />
                         <ItemsControl x:Name="PartSrcIpSegment4"
-                                      Grid.Column="3" />
+                                      Grid.Column="3"
+                                      ItemTemplate="{StaticResource SrcSegment4ItemTemplate}" />
                         <Canvas x:Name="PartSrcIpToPort"
                                 Grid.Column="4"
                                 ClipToBounds="True" />
-                        <Border Background="{Binding GraphElementBorderBrush, RelativeSource={RelativeSource AncestorType=local:IpFlowDiagram}}"
+                        <Border Background="{Binding PortSplitLineBrush, RelativeSource={RelativeSource AncestorType=local:IpFlowDiagram}}"
                                 Grid.Column="5" />
                         <Canvas x:Name="PartSrcToDestPort"
                                 Grid.Column="6" />
-                        <Border Background="{Binding GraphElementBorderBrush, RelativeSource={RelativeSource AncestorType=local:IpFlowDiagram}}"
+                        <Border Background="{Binding PortSplitLineBrush, RelativeSource={RelativeSource AncestorType=local:IpFlowDiagram}}"
                                 Grid.Column="7" />
                         <Canvas x:Name="PartDestIpToPort"
                                 Grid.Column="8"
                                 ClipToBounds="True" />
                         <ItemsControl x:Name="PartDestIpSegment4"
-                                      Grid.Column="9" />
+                                      Grid.Column="9"
+                                      ItemTemplate="{StaticResource DestSegment4ItemTemplate}" />
                         <ItemsControl x:Name="PartDestIpSegment3"
                                       Grid.Column="10" />
                         <ItemsControl x:Name="PartDestIpSegment2"

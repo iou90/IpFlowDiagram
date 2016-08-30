@@ -243,14 +243,22 @@ namespace Kant.Wpf.Controls.Chart
 
         #endregion
 
+        #region initial settings
+
         /// <summary>
         /// 20 by default
         /// </summary>
         public double IpSegmentColumnWidth { get; set; }
 
-        public Brush GraphElementBorderBrush { get; set; }
+        public Brush PortSplitLineBrush { get; set; }
+
+        public Brush IpSegmentNodeBorderBrush { get; set; }
 
         public Brush LinkBrush { get; set; }
+
+        public double LinkFillOpacity { get; set; }
+
+        public double LinkStrokeOpacity { get; set; }
 
         /// <summary>
         /// 0.55 by default, ranged from 0 to 1
@@ -273,6 +281,8 @@ namespace Kant.Wpf.Controls.Chart
         /// 10 by default
         /// </summary>
         public int MaxDisplayIpCount { get; set; }
+
+        #endregion
 
         private IpFlowDiagramAssist assist;
 

@@ -149,14 +149,14 @@ namespace Kant.Wpf.Controls.Chart
             var destIpToPortLinks = new List<IpFlowIpToPortLink>();
             var portLinks = new List<IpFlowPortLink>();
             var links = new List<IpFlowLink>();
-            var ipDatas = (from d in filteredDatas select new { Color = d.Color, SourceIp = d.SourceIp, SourcePort = d.SourcePort, DestinationIp = d.DestinationIp, DestinationPort = d.DestinationPort, SrcIpSegments = d.SourceIp.ToString().Split('.'), DestSegments = d.DestinationIp.ToString().Split('.') }).ToList(); // store the results
+            var ipDatas = (from d in filteredDatas select new { SourceColor = d.SourceColor, DestinationColor = d.DestinationColor, SourceIp = d.SourceIp, SourcePort = d.SourcePort, DestinationIp = d.DestinationIp, DestinationPort = d.DestinationPort, SrcIpSegments = d.SourceIp.ToString().Split('.'), DestSegments = d.DestinationIp.ToString().Split('.') }).ToList(); // store the results
 
             foreach (var data in ipDatas)
             {
                 var fillBrush = diagram.LinkBrush.CloneCurrentValue();
-                fillBrush.Opacity = styleManager.LinkFillOpacity;
+                fillBrush.Opacity = diagram.LinkFillOpacity;
                 var strokeBrush = diagram.LinkBrush.CloneCurrentValue();
-                strokeBrush.Opacity = styleManager.LinkStrokeOpacity;
+                strokeBrush.Opacity = diagram.LinkStrokeOpacity;
                 BuildCountDictionary(data.SrcIpSegments[0], srcIp1Dic);
                 BuildCountDictionary(data.SrcIpSegments[1], srcIp2Dic);
                 BuildCountDictionary(data.SrcIpSegments[2], srcIp3Dic);
@@ -217,20 +217,20 @@ namespace Kant.Wpf.Controls.Chart
                     IpAddress = data.SourceIp
                 };
 
-                AddSegment(data.SrcIpSegments[0], data.Color, ipColumnHeight, srcIp1Dic, src1Ips, 0, srcIpNode);
-                AddSegment(data.SrcIpSegments[1], data.Color, ipColumnHeight, srcIp2Dic, src2Ips, 1, srcIpNode);
-                AddSegment(data.SrcIpSegments[2], data.Color, ipColumnHeight, srcIp3Dic, src3Ips, 2, srcIpNode);
-                AddSegment(data.SrcIpSegments[3], data.Color, ipColumnHeight, srcIp4Dic, src4Ips, srcIpNode, srcIpToPortLinks);
+                AddSegment(data.SrcIpSegments[0], data.SourceColor, ipColumnHeight, srcIp1Dic, src1Ips, 0, srcIpNode);
+                AddSegment(data.SrcIpSegments[1], data.SourceColor, ipColumnHeight, srcIp2Dic, src2Ips, 1, srcIpNode);
+                AddSegment(data.SrcIpSegments[2], data.SourceColor, ipColumnHeight, srcIp3Dic, src3Ips, 2, srcIpNode);
+                AddSegment(data.SrcIpSegments[3], data.SourceColor, ipColumnHeight, srcIp4Dic, src4Ips, srcIpNode, srcIpToPortLinks);
 
                 var destIpNode = new IpFlowIpNode()
                 {
                     IpAddress = data.DestinationIp
                 };
 
-                AddSegment(data.DestSegments[0], data.Color, ipColumnHeight, destIp1Dic, dest1Ips, 0, destIpNode);
-                AddSegment(data.DestSegments[1], data.Color, ipColumnHeight, destIp2Dic, dest2Ips, 1, destIpNode);
-                AddSegment(data.DestSegments[2], data.Color, ipColumnHeight, destIp3Dic, dest3Ips, 2, destIpNode);
-                AddSegment(data.DestSegments[3], data.Color, ipColumnHeight, destIp4Dic, dest4Ips, destIpNode, destIpToPortLinks);
+                AddSegment(data.DestSegments[0], data.DestinationColor, ipColumnHeight, destIp1Dic, dest1Ips, 0, destIpNode);
+                AddSegment(data.DestSegments[1], data.DestinationColor, ipColumnHeight, destIp2Dic, dest2Ips, 1, destIpNode);
+                AddSegment(data.DestSegments[2], data.DestinationColor, ipColumnHeight, destIp3Dic, dest3Ips, 2, destIpNode);
+                AddSegment(data.DestSegments[3], data.DestinationColor, ipColumnHeight, destIp4Dic, dest4Ips, destIpNode, destIpToPortLinks);
 
                 nodes.Add(new IpFlowNode()
                 {

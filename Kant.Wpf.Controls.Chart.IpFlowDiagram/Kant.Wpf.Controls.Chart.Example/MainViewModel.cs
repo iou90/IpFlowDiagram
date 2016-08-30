@@ -103,6 +103,8 @@ namespace Kant.Wpf.Controls.Chart.Example
                             DestinationIp = random.Next(1, 192).ToString() + "." + random.Next(0, 168).ToString() + "." + random.Next(0, 55).ToString() + "." + random.Next(1, 255),
                             DestinationPort = random.Next(0, 65535),
                             SourcePort = random.Next(0, 65535),
+                            SourceColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#0099ff")) { Opacity = 0.6 },
+                            DestinationColor = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#dc89b9")) { Opacity = 0.6 },
                         });
                     }
 

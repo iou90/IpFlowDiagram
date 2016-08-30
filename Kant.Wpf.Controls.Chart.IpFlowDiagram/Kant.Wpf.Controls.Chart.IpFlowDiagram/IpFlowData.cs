@@ -13,7 +13,9 @@ namespace Kant.Wpf.Controls.Chart
         {
         }
 
-        public Brush Color { get; set; }
+        public Brush SourceColor { get; set; }
+
+        public Brush DestinationColor { get; set; }
 
         public string SourceIp { get; set; }
 

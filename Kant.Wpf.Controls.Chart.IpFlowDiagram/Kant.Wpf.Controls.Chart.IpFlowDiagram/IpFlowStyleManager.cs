@@ -31,11 +31,12 @@ namespace Kant.Wpf.Controls.Chart
             diagram.IpSegmentColumnWidth = 25.0;
             diagram.MaxDisplayIpCount = 10;
             diagram.LinkCurvature = 0.55;
-            diagram.GraphElementBorderBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#bbbbbb"));
+            diagram.PortSplitLineBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#bbbbbb"));
+            diagram.IpSegmentNodeBorderBrush = Brushes.Transparent;
             diagram.HighlightOpacity = 1.0;
             diagram.LoweredOpacity = 0.25;
-            LinkFillOpacity = 0.15;
-            LinkStrokeOpacity = 0.45;
+            diagram.LinkFillOpacity = 0.15;
+            diagram.LinkStrokeOpacity = 0.45;
         }
 
         public void UpdateLabelAdjustY()
@@ -117,10 +118,6 @@ namespace Kant.Wpf.Controls.Chart
         /// update while update label style 
         /// </summary>
         public double LabelAdjustedY { get; set; }
-
-        public double LinkFillOpacity { get; set; }
-
-        public double LinkStrokeOpacity { get; set; }
 
         private IpFlowDiagram diagram;
 
