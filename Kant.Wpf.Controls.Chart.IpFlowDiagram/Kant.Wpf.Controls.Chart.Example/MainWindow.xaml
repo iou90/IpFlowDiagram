@@ -67,9 +67,7 @@
             <Border Grid.Row="2"
                     Margin="20">
                 <kant:IpFlowDiagram Datas="{Binding Datas}"
-                                    LinkBrush="#44b5ff"
-                                    LinkFillOpacity="0.15"
-                                    LinkStrokeOpacity="1" />
+                                    LinkBrush="#44b5ff" />
             </Border>
         </Grid>
     </Grid>

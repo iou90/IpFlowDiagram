@@ -15,6 +15,8 @@ namespace Kant.Wpf.Controls.Chart
 
         public IpFlowIpSegment4 Node { get; set; }
 
+        public string IpAddress { get; set; }
+
         public string Segment { get; set; }
 
         public int Port { get; set; }

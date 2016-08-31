@@ -14,9 +14,11 @@ namespace Kant.Wpf.Controls.Chart
 
         public bool IsHighlight { get; set; }
 
-        public IpFlowIpNode SrcIpNode { get; set; }
+        public IpFlowIpSegmentFinder HighlightSegment { get; set; }
 
-        public IpFlowIpNode DestIpNode { get; set; }
+        public IpFlowIpNode SourceIpNode { get; set; }
+
+        public IpFlowIpNode DestinationIpNode { get; set; }
 
         public List<IpFlowLink> Links { get; set; }
     }

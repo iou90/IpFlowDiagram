@@ -67,6 +67,7 @@ namespace Kant.Wpf.Controls.Chart
             if (CheckTemplatePartExists(grid, "PartDiagramGrid"))
             {
                 assist.DiagramGrid = grid;
+                assist.HandleEvents(assist.DiagramGrid);
             }
 
             if (CheckTemplatePartExists(src1, "PartSrcIpSegment1"))
@@ -150,6 +151,7 @@ namespace Kant.Wpf.Controls.Chart
                 {
                     if (assist != null)
                     {
+                        assist.RemoveEventHandlers();
                         assist.ClearDiagram();
                     }
                 }
@@ -184,7 +186,7 @@ namespace Kant.Wpf.Controls.Chart
         private static object HighlightNodeValueCallback(DependencyObject o, object value)
         {
             var diagram = (IpFlowDiagram)o;
-            //diagram.styleManager.HighlightingNode((string)value, diagram.assist.SrcIpNodes, diagram.assist.DestIpNodes);
+            diagram.styleManager.HighlightingNode(value as IpFlowIpSegmentFinder, diagram.assist.Nodes);
 
             return value;
         }
@@ -217,13 +219,13 @@ namespace Kant.Wpf.Controls.Chart
 
         public static readonly DependencyProperty HighlightModeProperty = DependencyProperty.Register("HighlightMode", typeof(HighlightMode), typeof(IpFlowDiagram), new PropertyMetadata(HighlightMode.MouseLeftButtonUp, OnHighlightModeSourceChanged));
 
-        public string HighlightNode
+        public IpFlowIpSegmentFinder HighlightNode
         {
-            get { return (string)GetValue(HighlightNodeProperty); }
+            get { return (IpFlowIpSegmentFinder)GetValue(HighlightNodeProperty); }
             set { SetValue(HighlightNodeProperty, value); }
         }
 
-        public static readonly DependencyProperty HighlightNodeProperty = DependencyProperty.Register("HighlightNode", typeof(string), typeof(IpFlowDiagram), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, null, HighlightNodeValueCallback));
+        public static readonly DependencyProperty HighlightNodeProperty = DependencyProperty.Register("HighlightNode", typeof(IpFlowIpSegmentFinder), typeof(IpFlowDiagram), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, null, HighlightNodeValueCallback));
 
         public Style NodeLabelStyle
         {

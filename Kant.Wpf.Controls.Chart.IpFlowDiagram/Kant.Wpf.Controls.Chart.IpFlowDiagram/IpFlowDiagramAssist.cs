@@ -71,8 +71,19 @@ namespace Kant.Wpf.Controls.Chart
 
         #region clear something
 
+        public void RemoveEventHandlers()
+        {
+            if (DiagramGrid != null)
+            {
+                DiagramGrid.MouseEnter -= MouseEnter;
+                DiagramGrid.MouseLeave -= MouseLeave;
+                DiagramGrid.MouseLeftButtonUp -= MouseLeftButtonUp;
+            }
+        }
+
         public void ClearDiagram()
         {
+            styleManager.ClearHighlight();
             filteredDatas = null;
             nodes = null;
             srcPortLabels = null;
@@ -93,7 +104,7 @@ namespace Kant.Wpf.Controls.Chart
             }
         }
 
-        public void ClearDiagramCanvasChilds()
+        private void ClearDiagramCanvasChilds()
         {
             if (SrcIpToPortContainer != null && SrcIpToPortContainer.Children != null)
             {
@@ -130,10 +141,9 @@ namespace Kant.Wpf.Controls.Chart
                 return;
             }
 
-            if (diagram.LinkCurvature < 0 || diagram.LinkCurvature > 1)
-            {
-                throw new ArgumentOutOfRangeException("curvature should be ranged from 0 to 1");
-            }
+            CheckRange(diagram.LinkCurvature, "LinkCurvature", "curvature should be ranged from 0 to 1");
+            CheckRange(diagram.LinkFillOpacity, "LinkFillOpacity", "opacity should be ranged from 0 to 1");
+            CheckRange(diagram.LinkStrokeOpacity, "LinkStrokeOpacity", "opacity should be ranged from 0 to 1");
 
             #region preparing...
 
@@ -162,22 +172,22 @@ namespace Kant.Wpf.Controls.Chart
                 BuildCountDictionary(data.SrcIpSegments[2], srcIp3Dic);
                 var s4 = data.SrcIpSegments[3];
                 BuildCountDictionary(s4, srcIp4Dic);
-                var srcIpToPortLink = BuildLinks(CreateLink(data.SourcePort, s4, fillBrush, strokeBrush), srcIpToPortLinks, l => l.Segment == s4 && l.Port == data.SourcePort);
+                var srcIpToPortLink = BuildLinks(CreateIpToPortLink(data.SourceIp, data.SourcePort, s4, fillBrush, strokeBrush), srcIpToPortLinks, l => l.Segment == s4 && l.Port == data.SourcePort);
                 BuildCountDictionary(data.DestSegments[0], destIp1Dic);
                 BuildCountDictionary(data.DestSegments[1], destIp2Dic);
                 BuildCountDictionary(data.DestSegments[2], destIp3Dic);
                 var d4 = data.DestSegments[3];
                 BuildCountDictionary(d4, destIp4Dic);
-                var destIpToPortLink = BuildLinks(CreateLink(data.DestinationPort, d4, fillBrush, strokeBrush), destIpToPortLinks, l => l.Segment == d4 && l.Port == data.DestinationPort);
-                var portLink = BuildLinks(CreateLink(data.SourcePort, data.DestinationPort, fillBrush, strokeBrush), portLinks, l => l.SourcePort == data.SourcePort && l.DestinationPort == data.DestinationPort);
+                var destIpToPortLink = BuildLinks(CreateIpToPortLink(data.DestinationIp, data.DestinationPort, d4, fillBrush, strokeBrush), destIpToPortLinks, l => l.Segment == d4 && l.Port == data.DestinationPort);
+                var portLink = BuildLinks(CreatePortLink(data.SourcePort, data.DestinationPort, fillBrush, strokeBrush), portLinks, l => l.SourcePort == data.SourcePort && l.DestinationPort == data.DestinationPort);
 
                 links.Add(new IpFlowLink()
                 {
                     OriginalLinkFillBrush = fillBrush.CloneCurrentValue(),
                     OriginalLinkStrokeBrush = strokeBrush.CloneCurrentValue(),
-                    SrcIpToPortLink = srcIpToPortLink,
-                    DestPortToIpLink = destIpToPortLink,
-                    SrcToDestPortLink = portLink
+                    SourceIpToPortLink = srcIpToPortLink,
+                    DestinationIpToPortLink = destIpToPortLink,
+                    SourceToDestinationPortLink = portLink
                 });
             }
 
@@ -217,31 +227,32 @@ namespace Kant.Wpf.Controls.Chart
                     IpAddress = data.SourceIp
                 };
 
-                AddSegment(data.SrcIpSegments[0], data.SourceColor, ipColumnHeight, srcIp1Dic, src1Ips, 0, srcIpNode);
-                AddSegment(data.SrcIpSegments[1], data.SourceColor, ipColumnHeight, srcIp2Dic, src2Ips, 1, srcIpNode);
-                AddSegment(data.SrcIpSegments[2], data.SourceColor, ipColumnHeight, srcIp3Dic, src3Ips, 2, srcIpNode);
-                AddSegment(data.SrcIpSegments[3], data.SourceColor, ipColumnHeight, srcIp4Dic, src4Ips, srcIpNode, srcIpToPortLinks);
+                AddSegment(data.SrcIpSegments[0], data.SourceColor, ipColumnHeight, srcIp1Dic, src1Ips, 0, true, srcIpNode);
+                AddSegment(data.SrcIpSegments[1], data.SourceColor, ipColumnHeight, srcIp2Dic, src2Ips, 1, true, srcIpNode);
+                AddSegment(data.SrcIpSegments[2], data.SourceColor, ipColumnHeight, srcIp3Dic, src3Ips, 2, true, srcIpNode);
+                AddSegment(data.SrcIpSegments[3], data.SourceColor, ipColumnHeight, srcIp4Dic, src4Ips, true, srcIpNode, srcIpToPortLinks);
 
                 var destIpNode = new IpFlowIpNode()
                 {
                     IpAddress = data.DestinationIp
                 };
 
-                AddSegment(data.DestSegments[0], data.DestinationColor, ipColumnHeight, destIp1Dic, dest1Ips, 0, destIpNode);
-                AddSegment(data.DestSegments[1], data.DestinationColor, ipColumnHeight, destIp2Dic, dest2Ips, 1, destIpNode);
-                AddSegment(data.DestSegments[2], data.DestinationColor, ipColumnHeight, destIp3Dic, dest3Ips, 2, destIpNode);
-                AddSegment(data.DestSegments[3], data.DestinationColor, ipColumnHeight, destIp4Dic, dest4Ips, destIpNode, destIpToPortLinks);
+                AddSegment(data.DestSegments[0], data.DestinationColor, ipColumnHeight, destIp1Dic, dest1Ips, 0, false, destIpNode);
+                AddSegment(data.DestSegments[1], data.DestinationColor, ipColumnHeight, destIp2Dic, dest2Ips, 1, false, destIpNode);
+                AddSegment(data.DestSegments[2], data.DestinationColor, ipColumnHeight, destIp3Dic, dest3Ips, 2, false, destIpNode);
+                AddSegment(data.DestSegments[3], data.DestinationColor, ipColumnHeight, destIp4Dic, dest4Ips, false, destIpNode, destIpToPortLinks);
 
                 nodes.Add(new IpFlowNode()
                 {
-                    DestIpNode = destIpNode,
-                    SrcIpNode = srcIpNode
+                    DestinationIpNode = destIpNode,
+                    SourceIpNode = srcIpNode
                 });
 
                 AddSrcPortLabel(data.SourcePort, srcPortLabels);
                 AddDestPortLabel(data.DestinationPort, destPortLabels);
             }
 
+            nodes = nodes.GroupBy(n => n.SourceIpNode.IpAddress + n.DestinationIpNode.IpAddress).Select(group => group.First()).ToList();
             SrcIpSegment1Nodes = src1Ips;
             SrcIpSegment2Nodes = src2Ips;
             SrcIpSegment3Nodes = src3Ips;
@@ -286,7 +297,7 @@ namespace Kant.Wpf.Controls.Chart
 
             foreach (var node in nodes)
             {
-                //node.Links = links.Select
+                node.Links = links.FindAll(l => l.SourceIpToPortLink.IpAddress == node.SourceIpNode.IpAddress && l.DestinationIpToPortLink.IpAddress == node.DestinationIpNode.IpAddress);
             }
 
             #endregion
@@ -337,6 +348,14 @@ namespace Kant.Wpf.Controls.Chart
             return filteredDatas;
         }
 
+        private void CheckRange(double value, string parameterName, string message)
+        {
+            if(value < 0 || value > 1)
+            {
+                throw new ArgumentOutOfRangeException(parameterName, message);
+            }
+        }
+
         #region ip segment node
 
         private void CalculateSegment4VerticalPosition(List<IpFlowIpSegment4> segments)
@@ -354,13 +373,13 @@ namespace Kant.Wpf.Controls.Chart
             }
         }
 
-        private void AddSegment(string ipSegment, Brush color, double columnHeight, Dictionary<string, int> ipSegmentDic, List<IpFlowIpSegment4> segments, IpFlowIpNode ipNode, List<IpFlowIpToPortLink> links)
+        private void AddSegment(string ipSegment, Brush color, double columnHeight, Dictionary<string, int> ipSegmentDic, List<IpFlowIpSegment4> segments, bool isSrc, IpFlowIpNode ipNode, List<IpFlowIpToPortLink> links)
         {
             var findNode = segments.Find(n => n.Segment == ipSegment);
 
             if (findNode == null)
             {
-                var segment = ConfigureSegment(new IpFlowIpSegment4(), ipSegment, color, columnHeight, ipSegmentDic, segments);
+                var segment = ConfigureSegment(new IpFlowIpSegment4(), isSrc, 4, ipSegment, color, columnHeight, ipSegmentDic, segments);
                 segments.Add(segment);
                 ipNode.SetSegment(segment, 3);
                 CalculateLinkPositionInSegment4Node(segment, links);
@@ -371,14 +390,14 @@ namespace Kant.Wpf.Controls.Chart
             }
         }
 
-        private void AddSegment(string ipSegment, Brush color, double columnHeight, Dictionary<string, int> ipSegmentDic, List<IpFlowIpSegment> segments, int index, IpFlowIpNode ipNode)
+        private void AddSegment(string ipSegment, Brush color, double columnHeight, Dictionary<string, int> ipSegmentDic, List<IpFlowIpSegment> segments, int index, bool isSrc, IpFlowIpNode ipNode)
         {
             var findNode = segments.Find(n => n.Segment == ipSegment);
 
             if (findNode == null)
             {
-                var segment = ConfigureSegment(new IpFlowIpSegment(), ipSegment, color, columnHeight, ipSegmentDic, segments);
-                segment.IpAddress = ipNode.IpAddress;
+                var segment = ConfigureSegment(new IpFlowIpSegment(), isSrc, index, ipSegment, color, columnHeight, ipSegmentDic, segments);
+
                 segments.Add(segment);
                 ipNode.SetSegment(segment, index);
             }
@@ -388,7 +407,7 @@ namespace Kant.Wpf.Controls.Chart
             }
         }
 
-        private TSegment ConfigureSegment<TSegment>(TSegment segment, string ipSegment, Brush color, double columnHeight, Dictionary<string, int> ipSegmentDic, List<TSegment> nodes) where TSegment : IpFlowIpSegment
+        private TSegment ConfigureSegment<TSegment>(TSegment segment, bool isSrc, int index, string ipSegment, Brush color, double columnHeight, Dictionary<string, int> ipSegmentDic, List<TSegment> nodes) where TSegment : IpFlowIpSegment
         {
             var count = ipSegmentDic.Values.Sum();
             var height = ipSegmentDic[ipSegment] / (double)count * columnHeight;
@@ -396,6 +415,13 @@ namespace Kant.Wpf.Controls.Chart
             segment.Segment = ipSegment;
             segment.Color = color != null ? color.CloneCurrentValue() : styleManager.SetNodeBrush();
             segment.OriginalBrush = segment.Color.CloneCurrentValue();
+
+            segment.SegmentFinder = new IpFlowIpSegmentFinder()
+            {
+                IsSource = isSrc,
+                Segment = ipSegment,
+                Index = index
+            };
 
             return segment;
         }
@@ -837,39 +863,42 @@ namespace Kant.Wpf.Controls.Chart
         {
             var segmentLinks = links.FindAll(l => l.Segment == node.Segment).ToList();
             var sumCount = segmentLinks.Sum(l => { return l.Count; });
-            var position = 0.0;
+            var position = 0.5;
 
             foreach (var link in segmentLinks)
             {
                 link.PositionInNode = position;
-                link.Width = node.Height * link.Count / sumCount;
+                link.Width = (node.Height - 1) * link.Count / sumCount;
                 position += link.Width;
                 link.Node = node;
             }
         }
 
-        private IpFlowIpToPortLink CreateLink(int port, string segment, Brush fillBrush, Brush strokeBrush)
+        private IpFlowIpToPortLink CreateIpToPortLink(string ip, int port, string segment, Brush fillBrush, Brush strokeBrush)
         {
             var shape = new Path()
             {
                 Fill = fillBrush,
-                Stroke = strokeBrush
+                Stroke = strokeBrush,
+                SnapsToDevicePixels = true
             };
 
             return new IpFlowIpToPortLink()
             {
+                IpAddress = ip,
                 Shape = shape,
                 Port = port,
                 Segment = segment
             };
         }
 
-        private IpFlowPortLink CreateLink(int srcPort, int destPort, Brush fillBrush, Brush strokeBrush)
+        private IpFlowPortLink CreatePortLink(int srcPort, int destPort, Brush fillBrush, Brush strokeBrush)
         {
             var shape = new Path()
             {
                 Fill = fillBrush,
-                Stroke = strokeBrush
+                Stroke = strokeBrush,
+                SnapsToDevicePixels = true
             };
 
             return new IpFlowPortLink()
@@ -961,29 +990,36 @@ namespace Kant.Wpf.Controls.Chart
 
         #endregion
 
-        #region ip segment node events
+        #region event handlers
 
-        private void NodeMouseEnter(object sender, MouseEventArgs e)
+        public void HandleEvents(Grid grid)
+        {
+            grid.MouseEnter += MouseEnter;
+            grid.MouseLeave += MouseLeave;
+            grid.MouseLeftButtonUp += MouseLeftButtonUp;
+        }
+
+        private void MouseEnter(object sender, MouseEventArgs e)
         {
             if (diagram.HighlightMode == HighlightMode.MouseEnter)
             {
-                diagram.SetCurrentValue(IpFlowDiagram.HighlightNodeProperty, ((FrameworkElement)e.OriginalSource).Tag as string);
+                diagram.SetCurrentValue(IpFlowDiagram.HighlightNodeProperty, ((FrameworkElement)e.OriginalSource).Tag as IpFlowIpSegmentFinder);
             }
         }
 
-        private void NodeMouseLeave(object sender, MouseEventArgs e)
+        private void MouseLeave(object sender, MouseEventArgs e)
         {
             if (diagram.HighlightMode == HighlightMode.MouseEnter)
             {
-                diagram.SetCurrentValue(IpFlowDiagram.HighlightNodeProperty, ((FrameworkElement)e.OriginalSource).Tag as string);
+                diagram.SetCurrentValue(IpFlowDiagram.HighlightNodeProperty, ((FrameworkElement)e.OriginalSource).Tag as IpFlowIpSegmentFinder);
             }
         }
 
-        private void NodeMouseLeftButtonUp(object sender, MouseEventArgs e)
+        private void MouseLeftButtonUp(object sender, MouseEventArgs e)
         {
             if (diagram.HighlightMode == HighlightMode.MouseLeftButtonUp)
             {
-                diagram.SetCurrentValue(IpFlowDiagram.HighlightNodeProperty, ((FrameworkElement)e.OriginalSource).Tag as string);
+                diagram.SetCurrentValue(IpFlowDiagram.HighlightNodeProperty, ((FrameworkElement)e.OriginalSource).Tag as IpFlowIpSegmentFinder);
             }
         }
 

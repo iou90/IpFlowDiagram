@@ -13,6 +13,19 @@ namespace Kant.Wpf.Controls.Chart
             ipSegments = new IpFlowIpSegment[4];
         }
 
+        public bool IsSegmentExist(IpFlowIpSegmentFinder segmentFinder)
+        {
+            foreach (var s in ipSegments)
+            {
+                if(s.SegmentFinder.Equals(segmentFinder))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         public IpFlowIpSegment GetSegment(int index)
         {
             return ipSegments[index];

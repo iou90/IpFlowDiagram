@@ -52,11 +52,11 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Element.cs" />
     <Compile Include="IpFlowData.cs" />
     <Compile Include="IpFlowIpNode.cs" />
     <Compile Include="IpFlowIpSegment4.cs" />
     <Compile Include="IpFlowIpSegment.cs" />
+    <Compile Include="IpFlowIpSegmentFinder.cs" />
     <Compile Include="IpFlowIpToPortLink.cs" />
     <Compile Include="IpFlowLink.cs" />
     <Compile Include="IpFlowLinkBase.cs" />

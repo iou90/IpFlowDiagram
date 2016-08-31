@@ -32,7 +32,7 @@ namespace Kant.Wpf.Controls.Chart.Example
             var count = 55;
             var datas = new List<IpFlowData>();
 
-            for(var index = 0; index < count; index++)
+            for (var index = 0; index < count; index++)
             {
                 var port = random.Next(55, 57);
 

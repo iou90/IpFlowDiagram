@@ -14,11 +14,11 @@ namespace Kant.Wpf.Controls.Chart
         {
         }
 
-        public IpFlowIpToPortLink SrcIpToPortLink { get; set; }
+        public IpFlowIpToPortLink SourceIpToPortLink { get; set; }
 
-        public IpFlowIpToPortLink DestPortToIpLink { get; set; }
+        public IpFlowIpToPortLink DestinationIpToPortLink { get; set; }
 
-        public IpFlowPortLink SrcToDestPortLink { get; set; }
+        public IpFlowPortLink SourceToDestinationPortLink { get; set; }
 
         public Brush OriginalLinkFillBrush { get; set; }
 

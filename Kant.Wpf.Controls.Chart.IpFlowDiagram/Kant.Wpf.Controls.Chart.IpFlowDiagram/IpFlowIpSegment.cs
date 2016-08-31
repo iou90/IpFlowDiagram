@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Kant.Wpf.Toolkit.Mvvm;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,7 +10,7 @@ using System.Windows.Shapes;
 
 namespace Kant.Wpf.Controls.Chart
 {
-    public class IpFlowIpSegment
+    public class IpFlowIpSegment : ObservableObject
     {
         public IpFlowIpSegment()
         {
@@ -17,11 +18,23 @@ namespace Kant.Wpf.Controls.Chart
 
         public double Height { get; set; }
 
-        public Brush Color { get; set; }
+        public IpFlowIpSegmentFinder SegmentFinder { get; set; }
+
+        private Brush color;
+        public Brush Color
+        {
+            get
+            {
+                return color;
+            }
+            set
+            {
+                color = value;
+                RaisePropertyChanged(() => Color);
+            }
+        }
 
         public string Segment { get; set; }
-
-        public string IpAddress { get; set; }
 
         public Brush OriginalBrush { get; set; }
     }
