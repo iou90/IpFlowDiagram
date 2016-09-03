@@ -65,6 +65,17 @@
                                             <Border BorderThickness="0.5"
                                                     Height="{Binding Height}"
                                                     BorderBrush="{Binding IpSegmentNodeBorderBrush, RelativeSource={RelativeSource AncestorType=local:IpFlowDiagram}}">
+                                                <i:Interaction.Triggers>
+                                                    <!-- this will call the associated commands on your viewmodel when the mouse enters/leaves the corresponding view in your itemscontrol, from there you can create the viewmodel functionality you'd like-->
+                                                    <i:EventTrigger EventName="MouseEnter">
+                                                    </i:EventTrigger>
+                                                    <i:EventTrigger EventName="MouseLeave">
+                                                        
+                                                    </i:EventTrigger>
+                                                    <i:EventTrigger EventName="MouseLeftButtonUp">
+                                                        
+                                                    </i:EventTrigger>
+                                                </i:Interaction.Triggers>
                                                 <Grid>
                                                     <Rectangle Fill="{Binding Color}"
                                                                Tag="{Binding SegmentFinder}" />
