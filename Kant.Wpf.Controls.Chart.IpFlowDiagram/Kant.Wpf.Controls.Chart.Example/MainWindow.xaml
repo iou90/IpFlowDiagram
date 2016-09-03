@@ -58,8 +58,16 @@
             <Border Grid.Row="2"
                     Margin="20">
                 <kant:IpFlowDiagram Datas="{Binding Datas}"
-                                    HighlightNode="{Binding HighlightIpSegment}"
-                                    LinkBrush="#44b5ff" />
+                                    HighlightNode="{Binding HighlightIpSegment}">
+                    <kant:IpFlowDiagram.LinkFill>
+                        <SolidColorBrush Color="#44b5ff"
+                                         Opacity="0.15" />
+                    </kant:IpFlowDiagram.LinkFill>
+                    <kant:IpFlowDiagram.LinkStroke>
+                        <SolidColorBrush Color="#44b5ff"
+                                         Opacity="0.75" />
+                    </kant:IpFlowDiagram.LinkStroke>
+                </kant:IpFlowDiagram>
             </Border>
         </Grid>
     </Grid>

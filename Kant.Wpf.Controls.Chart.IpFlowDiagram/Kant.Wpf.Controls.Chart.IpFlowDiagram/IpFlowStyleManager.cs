@@ -27,7 +27,8 @@ namespace Kant.Wpf.Controls.Chart
         {
             var opacity = 0.55;
             defaultNodesPalette = GetNodeLinksPalette(opacity);
-            diagram.LinkBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#9ceaff"));
+            diagram.LinkFill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#9ceaff")) { Opacity = 0.15 };
+            diagram.LinkStroke = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#9ceaff")) { Opacity = 0.75 };
             diagram.IpSegmentColumnWidth = 25.0;
             diagram.MaxDisplayIpCount = 10;
             diagram.LinkCurvature = 0.55;
@@ -35,8 +36,6 @@ namespace Kant.Wpf.Controls.Chart
             diagram.IpSegmentNodeBorderBrush = Brushes.Transparent;
             diagram.HighlightOpacity = 1.0;
             diagram.LoweredOpacity = 0.25;
-            diagram.LinkFillOpacity = 0.15;
-            diagram.LinkStrokeOpacity = 0.55;
         }
 
         public void UpdateLabelAdjustY()
@@ -89,6 +88,8 @@ namespace Kant.Wpf.Controls.Chart
                 return;
             }
 
+            var highlightLinkFillOpacity = diagram.LinkFill.Opacity / diagram.LinkStroke.Opacity * diagram.HighlightOpacity;
+
             // ensure minimize same element once && not minmize hightlight element
             var minimizedSegments = new HashSet<IpFlowIpSegment>();
             var highlightSegments = new HashSet<IpFlowIpSegment>();
@@ -97,6 +98,8 @@ namespace Kant.Wpf.Controls.Chart
 
             foreach (var node in nodes)
             {
+                #region highlight
+
                 var highlight = segmentFinder.IsSource ? node.SourceIpNode.IsSegmentExist(segmentFinder) : node.DestinationIpNode.IsSegmentExist(segmentFinder);
 
                 if (highlight)
@@ -113,9 +116,9 @@ namespace Kant.Wpf.Controls.Chart
 
                     foreach (var link in node.Links)
                     {
-                        link.SourceIpToPortLink.Shape.Fill.Opacity = diagram.HighlightOpacity;
-                        link.DestinationIpToPortLink.Shape.Fill.Opacity = diagram.HighlightOpacity;
-                        link.SourceToDestinationPortLink.Shape.Fill.Opacity = diagram.HighlightOpacity;
+                        link.SourceIpToPortLink.Shape.Fill.Opacity = highlightLinkFillOpacity;
+                        link.DestinationIpToPortLink.Shape.Fill.Opacity = highlightLinkFillOpacity;
+                        link.SourceToDestinationPortLink.Shape.Fill.Opacity = highlightLinkFillOpacity;
                         link.SourceIpToPortLink.Shape.Stroke.Opacity = diagram.HighlightOpacity;
                         link.DestinationIpToPortLink.Shape.Stroke.Opacity = diagram.HighlightOpacity;
                         link.SourceToDestinationPortLink.Shape.Stroke.Opacity = diagram.HighlightOpacity;
@@ -126,9 +129,13 @@ namespace Kant.Wpf.Controls.Chart
 
                     node.IsHighlight = true;
                     node.HighlightSegment = segmentFinder;
+
+                    #endregion
                 }
                 else
                 {
+                    #region minimize
+
                     var l = node.Links[0];
                     var minimizeFillOpacity = l.SourceIpToPortLink.Shape.Fill.Opacity - diagram.LoweredOpacity < 0 ? 0 : l.SourceIpToPortLink.Shape.Fill.Opacity - diagram.LoweredOpacity;
                     var minimizeStrokeOpacity = l.SourceIpToPortLink.Shape.Stroke.Opacity - diagram.LoweredOpacity < 0 ? 0 : l.SourceIpToPortLink.Shape.Stroke.Opacity - diagram.LoweredOpacity;
@@ -179,6 +186,8 @@ namespace Kant.Wpf.Controls.Chart
 
                     node.IsHighlight = false;
                     node.HighlightSegment = null;
+
+                    #endregion
                 }
             }
         }

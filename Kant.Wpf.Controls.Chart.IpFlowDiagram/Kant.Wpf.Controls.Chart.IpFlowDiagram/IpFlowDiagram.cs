@@ -305,11 +305,9 @@ namespace Kant.Wpf.Controls.Chart
 
         public Brush IpSegmentNodeBorderBrush { get; set; }
 
-        public Brush LinkBrush { get; set; }
+        public Brush LinkFill { get; set; }
 
-        public double LinkFillOpacity { get; set; }
-
-        public double LinkStrokeOpacity { get; set; }
+        public Brush LinkStroke { get; set; }
 
         /// <summary>
         /// 0.55 by default, ranged from 0 to 1

@@ -142,8 +142,6 @@ namespace Kant.Wpf.Controls.Chart
             }
 
             CheckRange(diagram.LinkCurvature, "LinkCurvature", "curvature should be ranged from 0 to 1");
-            CheckRange(diagram.LinkFillOpacity, "LinkFillOpacity", "opacity should be ranged from 0 to 1");
-            CheckRange(diagram.LinkStrokeOpacity, "LinkStrokeOpacity", "opacity should be ranged from 0 to 1");
 
             #region preparing...
 
@@ -163,28 +161,24 @@ namespace Kant.Wpf.Controls.Chart
 
             foreach (var data in ipDatas)
             {
-                var fillBrush = diagram.LinkBrush.CloneCurrentValue();
-                fillBrush.Opacity = diagram.LinkFillOpacity;
-                var strokeBrush = diagram.LinkBrush.CloneCurrentValue();
-                strokeBrush.Opacity = diagram.LinkStrokeOpacity;
                 BuildCountDictionary(data.SrcIpSegments[0], srcIp1Dic);
                 BuildCountDictionary(data.SrcIpSegments[1], srcIp2Dic);
                 BuildCountDictionary(data.SrcIpSegments[2], srcIp3Dic);
                 var s4 = data.SrcIpSegments[3];
                 BuildCountDictionary(s4, srcIp4Dic);
-                var srcIpToPortLink = BuildLinks(CreateIpToPortLink(data.SourceIp, data.SourcePort, s4, fillBrush, strokeBrush), srcIpToPortLinks, l => l.Segment == s4 && l.Port == data.SourcePort);
+                var srcIpToPortLink = BuildLinks(CreateIpToPortLink(data.SourceIp, data.SourcePort, s4, diagram.LinkFill, diagram.LinkStroke), srcIpToPortLinks, l => l.Segment == s4 && l.Port == data.SourcePort);
                 BuildCountDictionary(data.DestSegments[0], destIp1Dic);
                 BuildCountDictionary(data.DestSegments[1], destIp2Dic);
                 BuildCountDictionary(data.DestSegments[2], destIp3Dic);
                 var d4 = data.DestSegments[3];
                 BuildCountDictionary(d4, destIp4Dic);
-                var destIpToPortLink = BuildLinks(CreateIpToPortLink(data.DestinationIp, data.DestinationPort, d4, fillBrush, strokeBrush), destIpToPortLinks, l => l.Segment == d4 && l.Port == data.DestinationPort);
-                var portLink = BuildLinks(CreatePortLink(data.SourcePort, data.DestinationPort, fillBrush, strokeBrush), portLinks, l => l.SourcePort == data.SourcePort && l.DestinationPort == data.DestinationPort);
+                var destIpToPortLink = BuildLinks(CreateIpToPortLink(data.DestinationIp, data.DestinationPort, d4, diagram.LinkFill, diagram.LinkStroke), destIpToPortLinks, l => l.Segment == d4 && l.Port == data.DestinationPort);
+                var portLink = BuildLinks(CreatePortLink(data.SourcePort, data.DestinationPort, diagram.LinkFill, diagram.LinkStroke), portLinks, l => l.SourcePort == data.SourcePort && l.DestinationPort == data.DestinationPort);
 
                 links.Add(new IpFlowLink()
                 {
-                    OriginalLinkFillBrush = fillBrush.CloneCurrentValue(),
-                    OriginalLinkStrokeBrush = strokeBrush.CloneCurrentValue(),
+                    OriginalLinkFillBrush = diagram.LinkFill.CloneCurrentValue(),
+                    OriginalLinkStrokeBrush = diagram.LinkStroke.CloneCurrentValue(),
                     SourceIpToPortLink = srcIpToPortLink,
                     DestinationIpToPortLink = destIpToPortLink,
                     SourceToDestinationPortLink = portLink
