@@ -199,6 +199,55 @@ namespace Kant.Wpf.Controls.Chart
 
         #endregion
 
+        #region Commands
+
+        public ICommand MouseLeftButtonUpIpFlowIpSegment
+        {
+            get
+            {
+                if (HighlightMode == HighlightMode.MouseLeftButtonUp)
+                {
+                    return assist.SelectIpFlowIpSegment;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
+
+        public ICommand MouseEnterIpFlowIpSegment
+        {
+            get
+            {
+                if (HighlightMode == HighlightMode.MouseEnter)
+                {
+                    return assist.SelectIpFlowIpSegment;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
+
+        public ICommand MouseLeaveIpFlowIpSegment
+        {
+            get
+            {
+                if (HighlightMode == HighlightMode.MouseEnter)
+                {
+                    return assist.UnselectIpFlowIpSegment;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+        }
+
+        #endregion
+
         #region Fields & Properties
 
         #region dependency properties

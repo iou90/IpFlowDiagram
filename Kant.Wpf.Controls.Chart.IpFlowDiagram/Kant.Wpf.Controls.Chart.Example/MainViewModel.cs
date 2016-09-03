@@ -23,10 +23,6 @@ namespace Kant.Wpf.Controls.Chart.Example
         public MainViewModel()
         {
             random = new Random();
-            //bubbleColor = (Brush)Application.Current.FindResource("BubbleColor");
-            //bubbleLabelStyle1 = (Style)Application.Current.FindResource("BubbleLabelStyle1");
-            //bubbleLabelStyle2 = (Style)Application.Current.FindResource("BubbleLabelStyle2");
-            //BubbleLabelStyle = bubbleLabelStyle2;
 
             // random datas
             var count = 55;
@@ -78,7 +74,6 @@ namespace Kant.Wpf.Controls.Chart.Example
             //datas[10].DestinationPort = datas[10].SourcePort = 20;
             //datas[11].DestinationPort = datas[11].SourcePort = 100;
             Datas = datas;
-            BubbleBrushes = new Dictionary<string, Brush>() { { "word1", bubbleColor } };
         }
 
         #endregion
@@ -132,6 +127,7 @@ namespace Kant.Wpf.Controls.Chart.Example
             {
                 return GetCommand(clearHighlight, new RelayCommand(() =>
                 {
+                    HighlightIpSegment = null;
                 }));
             }
         }
@@ -143,17 +139,12 @@ namespace Kant.Wpf.Controls.Chart.Example
             {
                 return GetCommand(highlightingNode, new RelayCommand(() =>
                 {
-                }));
-            }
-        }
-
-        private ICommand highlightingLink;
-        public ICommand HighlightingLink
-        {
-            get
-            {
-                return GetCommand(highlightingLink, new RelayCommand(() =>
-                {
+                    HighlightIpSegment = new IpFlowIpSegmentFinder()
+                    {
+                        Index = 3,
+                        IsSource = random.Next(0, 2) == 0 ? true : false,
+                        Segment = random.Next(1, 5).ToString()
+                    };
                 }));
             }
         }
@@ -188,122 +179,19 @@ namespace Kant.Wpf.Controls.Chart.Example
             }
         }
 
-        private Brush bubbleBrush;
-        public Brush BubbleBrush
+        private IpFlowIpSegmentFinder highlightIpSegment;
+        public IpFlowIpSegmentFinder HighlightIpSegment
         {
             get
             {
-                return bubbleBrush;
+                return highlightIpSegment;
             }
             set
             {
-                if (value != bubbleBrush)
-                {
-                    bubbleBrush = value;
-                    RaisePropertyChanged(() => BubbleBrush);
-                }
+                highlightIpSegment = value;
+                RaisePropertyChanged(() => HighlightIpSegment);
             }
         }
-
-        private Dictionary<string, Brush> bubbleBrushes;
-        public Dictionary<string, Brush> BubbleBrushes
-        {
-            get
-            {
-                return bubbleBrushes;
-            }
-            set
-            {
-                if (value != bubbleBrushes)
-                {
-                    bubbleBrushes = value;
-                    RaisePropertyChanged(() => BubbleBrushes);
-                }
-            }
-        }
-
-        private HighlightMode highlightMode;
-        public HighlightMode HighlightMode
-        {
-            get
-            {
-                return highlightMode;
-            }
-            set
-            {
-                highlightMode = value;
-                RaisePropertyChanged(() => HighlightMode);
-            }
-        }
-
-        private string highlightNode;
-        public string HighlightNode
-        {
-            get
-            {
-                return highlightNode;
-            }
-            set
-            {
-                highlightNode = value;
-                RaisePropertyChanged(() => HighlightNode);
-            }
-        }
-
-        #region bubble test
-
-        private double diameter;
-        public double Diameter
-        {
-            get
-            {
-                return diameter;
-            }
-            set
-            {
-                diameter = value;
-                RaisePropertyChanged(() => Diameter);
-            }
-        }
-
-        private string label;
-        public string Label
-        {
-            get
-            {
-                return label;
-            }
-            set
-            {
-                label = value;
-                RaisePropertyChanged(() => Label);
-            }
-        }
-
-        #endregion
-
-        private Style bubbleLabelStyle;
-        public Style BubbleLabelStyle
-        {
-            get
-            {
-                return bubbleLabelStyle;
-            }
-            set
-            {
-                if (value != bubbleLabelStyle)
-                {
-                    bubbleLabelStyle = value;
-                    RaisePropertyChanged(() => BubbleLabelStyle);
-                }
-            }
-        }
-
-        private Style bubbleLabelStyle1;
-
-        private Style bubbleLabelStyle2;
-
-        private Brush bubbleColor;
 
         private Random random;
 

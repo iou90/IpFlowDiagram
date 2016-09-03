@@ -18,6 +18,19 @@
         <Border BorderThickness="0.5,0.5,0,0.5"
                 Height="{Binding Height}"
                 BorderBrush="{Binding IpSegmentNodeBorderBrush, RelativeSource={RelativeSource AncestorType=local:IpFlowDiagram}}">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="MouseEnter">
+                    <i:InvokeCommandAction Command="{Binding MouseEnterIpFlowIpSegment, RelativeSource={RelativeSource AncestorType=local:IpFlowDiagram}}"
+                                           CommandParameter="{Binding SegmentFinder}" />
+                </i:EventTrigger>
+                <i:EventTrigger EventName="MouseLeave">
+                    <i:InvokeCommandAction Command="{Binding MouseLeaveIpFlowIpSegment, RelativeSource={RelativeSource AncestorType=local:IpFlowDiagram}}" />
+                </i:EventTrigger>
+                <i:EventTrigger EventName="MouseLeftButtonUp">
+                    <i:InvokeCommandAction Command="{Binding MouseLeftButtonUpIpFlowIpSegment, RelativeSource={RelativeSource AncestorType=local:IpFlowDiagram}}"
+                                           CommandParameter="{Binding SegmentFinder}" />
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
             <Grid Tag="{Binding IpAddress}">
                 <Rectangle Fill="{Binding Color}"
                            Tag="{Binding SegmentFinder}" />
@@ -33,6 +46,19 @@
         <Border BorderThickness="0,0.5,0.5,0.5"
                 Height="{Binding Height}"
                 BorderBrush="{Binding IpSegmentNodeBorderBrush, RelativeSource={RelativeSource AncestorType=local:IpFlowDiagram}}">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="MouseEnter">
+                    <i:InvokeCommandAction Command="{Binding MouseEnterIpFlowIpSegment, RelativeSource={RelativeSource AncestorType=local:IpFlowDiagram}}"
+                                           CommandParameter="{Binding SegmentFinder}" />
+                </i:EventTrigger>
+                <i:EventTrigger EventName="MouseLeave">
+                    <i:InvokeCommandAction Command="{Binding MouseLeaveIpFlowIpSegment, RelativeSource={RelativeSource AncestorType=local:IpFlowDiagram}}" />
+                </i:EventTrigger>
+                <i:EventTrigger EventName="MouseLeftButtonUp">
+                    <i:InvokeCommandAction Command="{Binding MouseLeftButtonUpIpFlowIpSegment, RelativeSource={RelativeSource AncestorType=local:IpFlowDiagram}}"
+                                           CommandParameter="{Binding SegmentFinder}" />
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
             <Grid>
                 <Rectangle Fill="{Binding Color}"
                            Tag="{Binding SegmentFinder}" />
@@ -66,14 +92,16 @@
                                                     Height="{Binding Height}"
                                                     BorderBrush="{Binding IpSegmentNodeBorderBrush, RelativeSource={RelativeSource AncestorType=local:IpFlowDiagram}}">
                                                 <i:Interaction.Triggers>
-                                                    <!-- this will call the associated commands on your viewmodel when the mouse enters/leaves the corresponding view in your itemscontrol, from there you can create the viewmodel functionality you'd like-->
                                                     <i:EventTrigger EventName="MouseEnter">
+                                                        <i:InvokeCommandAction Command="{Binding MouseEnterIpFlowIpSegment, RelativeSource={RelativeSource AncestorType=local:IpFlowDiagram}}"
+                                                                               CommandParameter="{Binding SegmentFinder}" />
                                                     </i:EventTrigger>
                                                     <i:EventTrigger EventName="MouseLeave">
-                                                        
+                                                        <i:InvokeCommandAction Command="{Binding MouseLeaveIpFlowIpSegment, RelativeSource={RelativeSource AncestorType=local:IpFlowDiagram}}" />
                                                     </i:EventTrigger>
                                                     <i:EventTrigger EventName="MouseLeftButtonUp">
-                                                        
+                                                        <i:InvokeCommandAction Command="{Binding MouseLeftButtonUpIpFlowIpSegment, RelativeSource={RelativeSource AncestorType=local:IpFlowDiagram}}"
+                                                                               CommandParameter="{Binding SegmentFinder}" />
                                                     </i:EventTrigger>
                                                 </i:Interaction.Triggers>
                                                 <Grid>

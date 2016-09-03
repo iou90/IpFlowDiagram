@@ -379,7 +379,7 @@ namespace Kant.Wpf.Controls.Chart
 
             if (findNode == null)
             {
-                var segment = ConfigureSegment(new IpFlowIpSegment4(), isSrc, 4, ipSegment, color, columnHeight, ipSegmentDic, segments);
+                var segment = ConfigureSegment(new IpFlowIpSegment4(), isSrc, 3, ipSegment, color, columnHeight, ipSegmentDic, segments);
                 segments.Add(segment);
                 ipNode.SetSegment(segment, 3);
                 CalculateLinkPositionInSegment4Node(segment, links);
@@ -994,9 +994,9 @@ namespace Kant.Wpf.Controls.Chart
 
         public void HandleEvents(Grid grid)
         {
-            grid.MouseEnter += MouseEnter;
-            grid.MouseLeave += MouseLeave;
-            grid.MouseLeftButtonUp += MouseLeftButtonUp;
+            //grid.MouseEnter += MouseEnter;
+            //grid.MouseLeave += MouseLeave;
+            //grid.MouseLeftButtonUp += MouseLeftButtonUp;
         }
 
         private void MouseEnter(object sender, MouseEventArgs e)
@@ -1024,6 +1024,34 @@ namespace Kant.Wpf.Controls.Chart
         }
 
         #endregion
+
+        #endregion
+
+        #region Commands
+
+        private ICommand selectIpFlowIpSegment;
+        public ICommand SelectIpFlowIpSegment
+        {
+            get
+            {
+                return GetCommand(selectIpFlowIpSegment, new RelayCommand<IpFlowIpSegmentFinder>(finder =>
+                {
+                    diagram.SetCurrentValue(IpFlowDiagram.HighlightNodeProperty, finder);
+                }));
+            }
+        }
+
+        private ICommand unselectIpFlowIpSegment;
+        public ICommand UnselectIpFlowIpSegment
+        {
+            get
+            {
+                return GetCommand(unselectIpFlowIpSegment, new RelayCommand(() =>
+                {
+                    diagram.SetCurrentValue(IpFlowDiagram.HighlightNodeProperty, null);
+                }));
+            }
+        }
 
         #endregion
 
