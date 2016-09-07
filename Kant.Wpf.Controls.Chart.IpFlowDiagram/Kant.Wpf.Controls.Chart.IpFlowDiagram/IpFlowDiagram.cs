@@ -67,7 +67,6 @@ namespace Kant.Wpf.Controls.Chart
             if (CheckTemplatePartExists(grid, "PartDiagramGrid"))
             {
                 assist.DiagramGrid = grid;
-                assist.HandleEvents(assist.DiagramGrid);
             }
 
             if (CheckTemplatePartExists(src1, "PartSrcIpSegment1"))
@@ -151,7 +150,6 @@ namespace Kant.Wpf.Controls.Chart
                 {
                     if (assist != null)
                     {
-                        assist.RemoveEventHandlers();
                         assist.ClearDiagram();
                     }
                 }
@@ -183,10 +181,23 @@ namespace Kant.Wpf.Controls.Chart
             ((IpFlowDiagram)o).assist.UpdateDiagram((IEnumerable<IpFlowData>)e.NewValue);
         }
 
+        private static void OnSegmentNodeToolTipTemplateSourceChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
+        {
+            var diagram = (IpFlowDiagram)o;
+            diagram.styleManager.ChangeSegmentNodeToolTipTemplate((ControlTemplate)e.NewValue, diagram.assist.SrcIpSegment1Nodes);
+            diagram.styleManager.ChangeSegmentNodeToolTipTemplate((ControlTemplate)e.NewValue, diagram.assist.SrcIpSegment2Nodes);
+            diagram.styleManager.ChangeSegmentNodeToolTipTemplate((ControlTemplate)e.NewValue, diagram.assist.SrcIpSegment3Nodes);
+            diagram.styleManager.ChangeSegmentNodeToolTipTemplate((ControlTemplate)e.NewValue, diagram.assist.SrcIpSegment4Nodes);
+            diagram.styleManager.ChangeSegmentNodeToolTipTemplate((ControlTemplate)e.NewValue, diagram.assist.DestIpSegment1Nodes);
+            diagram.styleManager.ChangeSegmentNodeToolTipTemplate((ControlTemplate)e.NewValue, diagram.assist.DestIpSegment2Nodes);
+            diagram.styleManager.ChangeSegmentNodeToolTipTemplate((ControlTemplate)e.NewValue, diagram.assist.DestIpSegment3Nodes);
+            diagram.styleManager.ChangeSegmentNodeToolTipTemplate((ControlTemplate)e.NewValue, diagram.assist.DestIpSegment4Nodes);
+        }
+
         private static object HighlightNodeValueCallback(DependencyObject o, object value)
         {
             var diagram = (IpFlowDiagram)o;
-            diagram.styleManager.HighlightingNode(value as IpFlowIpSegmentFinder, diagram.assist.Nodes);
+            diagram.styleManager.HighlightingNode((IpFlowIpSegmentFinder)value, diagram.assist.Nodes);
 
             return value;
         }
@@ -291,6 +302,14 @@ namespace Kant.Wpf.Controls.Chart
         }
 
         public static readonly DependencyProperty LegendLabelStyleProperty = DependencyProperty.Register("LegendLabelStyle", typeof(Style), typeof(IpFlowDiagram));
+
+        public ControlTemplate SegmentNodeToolTipTemplate
+        {
+            get { return (ControlTemplate)GetValue(SegmentNodeToolTipTemplateProperty); }
+            set { SetValue(SegmentNodeToolTipTemplateProperty, value); }
+        }
+
+        public static readonly DependencyProperty SegmentNodeToolTipTemplateProperty = DependencyProperty.Register("SegmentNodeToolTipTemplate", typeof(ControlTemplate), typeof(IpFlowDiagram), new PropertyMetadata(OnSegmentNodeToolTipTemplateSourceChanged));
 
         #endregion
 

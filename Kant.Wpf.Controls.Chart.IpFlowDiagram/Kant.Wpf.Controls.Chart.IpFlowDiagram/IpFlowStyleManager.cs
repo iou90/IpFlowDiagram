@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 using System.Windows.Media;
 
 namespace Kant.Wpf.Controls.Chart
@@ -28,14 +29,14 @@ namespace Kant.Wpf.Controls.Chart
             var opacity = 0.55;
             defaultNodesPalette = GetNodeLinksPalette(opacity);
             diagram.LinkFill = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#9ceaff")) { Opacity = 0.15 };
-            diagram.LinkStroke = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#9ceaff")) { Opacity = 0.75 };
+            diagram.LinkStroke = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#9ceaff")) { Opacity = 0.25 };
             diagram.IpSegmentColumnWidth = 25.0;
             diagram.MaxDisplayIpCount = 10;
             diagram.LinkCurvature = 0.55;
             diagram.PortSplitLineBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#bbbbbb"));
             diagram.IpSegmentNodeBorderBrush = Brushes.Transparent;
             diagram.HighlightOpacity = 1.0;
-            diagram.LoweredOpacity = 0.25;
+            diagram.LoweredOpacity = 0.1;
         }
 
         public void UpdateLabelAdjustY()
@@ -57,6 +58,19 @@ namespace Kant.Wpf.Controls.Chart
             }
 
             return brush;
+        }
+
+        public void ChangeSegmentNodeToolTipTemplate(ControlTemplate newTemplate, IReadOnlyList<IpFlowIpSegment> nodes)
+        {
+            if(nodes == null)
+            {
+                return;
+            }
+
+            foreach(var node in nodes)
+            {
+                node.SegmentNodeToolTipTemplate = newTemplate;
+            }
         }
 
         public void ClearHighlight()

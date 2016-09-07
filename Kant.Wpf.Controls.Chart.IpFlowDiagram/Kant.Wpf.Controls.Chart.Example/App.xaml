@@ -3,4 +3,31 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:Kant.Wpf.Controls.Chart.Example"
              StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <ControlTemplate x:Key="ToolTipTemplate1"
+                         TargetType="ToolTip">
+            <Border Padding="5"
+                    BorderThickness="1"
+                    BorderBrush="Black"
+                    Background="White">
+                <TextBlock HorizontalAlignment="Center">
+                    <Run Text="{Binding PartIp}" />
+                    <Run Text="count:" />
+                    <Run Text="{Binding Count}" /></TextBlock>
+            </Border>
+        </ControlTemplate>
+        <ControlTemplate x:Key="ToolTipTemplate2"
+                         TargetType="ToolTip">
+            <Border Padding="5">
+                <Border.Background>
+                    <SolidColorBrush Color="DarkRed"
+                                     Opacity="0.25" />
+                </Border.Background>
+                <TextBlock HorizontalAlignment="Center">
+                    <Run Text="{Binding PartIp}" />
+                    <Run Text="count:" />
+                    <Run Text="{Binding Count}" /></TextBlock>
+            </Border>
+        </ControlTemplate>
+    </Application.Resources>
 </Application>

@@ -34,7 +34,33 @@ namespace Kant.Wpf.Controls.Chart
             }
         }
 
+        //public ControlTemplate SegmentNodeToolTipTemplate { get; set; }
+
+        private ControlTemplate segmentNodeToolTipTemplate;
+        public ControlTemplate SegmentNodeToolTipTemplate
+        {
+            get
+            {
+                return segmentNodeToolTipTemplate;
+            }
+            set
+            {
+                segmentNodeToolTipTemplate = value;
+                RaisePropertyChanged(() => SegmentNodeToolTipTemplate);
+            }
+        }
+
         public string Segment { get; set; }
+
+        /// <summary>
+        /// if segment is "55" and the index is 3, then part ip should be xxx.xxx.55
+        /// </summary>
+        public string PartIp { get; set; }
+
+        /// <summary>
+        /// count of flow from this segment node 
+        /// </summary>
+        public int Count { get; set; }
 
         public Brush OriginalBrush { get; set; }
     }

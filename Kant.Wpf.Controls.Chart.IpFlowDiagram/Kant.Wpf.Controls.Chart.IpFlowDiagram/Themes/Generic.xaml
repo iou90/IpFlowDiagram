@@ -14,38 +14,20 @@
         <Setter Property="Margin"
                 Value="0,5" />
     </Style>
+    <ControlTemplate x:Key="DefaultToolTipTemplate"
+                     TargetType="ToolTip">
+        <TextBlock HorizontalAlignment="Center">
+            <Run Text="{Binding PartIp}" />
+            <Run Text="count:" />
+            <Run Text="{Binding Count}" /></TextBlock>
+    </ControlTemplate>
     <DataTemplate x:Key="SrcSegment4ItemTemplate">
         <Border BorderThickness="0.5,0.5,0,0.5"
                 Height="{Binding Height}"
                 BorderBrush="{Binding IpSegmentNodeBorderBrush, RelativeSource={RelativeSource AncestorType=local:IpFlowDiagram}}">
-            <i:Interaction.Triggers>
-                <i:EventTrigger EventName="MouseEnter">
-                    <i:InvokeCommandAction Command="{Binding MouseEnterIpFlowIpSegment, RelativeSource={RelativeSource AncestorType=local:IpFlowDiagram}}"
-                                           CommandParameter="{Binding SegmentFinder}" />
-                </i:EventTrigger>
-                <i:EventTrigger EventName="MouseLeave">
-                    <i:InvokeCommandAction Command="{Binding MouseLeaveIpFlowIpSegment, RelativeSource={RelativeSource AncestorType=local:IpFlowDiagram}}" />
-                </i:EventTrigger>
-                <i:EventTrigger EventName="MouseLeftButtonUp">
-                    <i:InvokeCommandAction Command="{Binding MouseLeftButtonUpIpFlowIpSegment, RelativeSource={RelativeSource AncestorType=local:IpFlowDiagram}}"
-                                           CommandParameter="{Binding SegmentFinder}" />
-                </i:EventTrigger>
-            </i:Interaction.Triggers>
-            <Grid Tag="{Binding IpAddress}">
-                <Rectangle Fill="{Binding Color}"
-                           Tag="{Binding SegmentFinder}" />
-                <TextBlock HorizontalAlignment="Center"
-                           VerticalAlignment="Center"
-                           Tag="{Binding SegmentFinder}"
-                           Text="{Binding Segment}"
-                           Style="{Binding NodeLabelStyle, RelativeSource={RelativeSource AncestorType=local:IpFlowDiagram}}" />
-            </Grid>
-        </Border>
-    </DataTemplate>
-    <DataTemplate x:Key="DestSegment4ItemTemplate">
-        <Border BorderThickness="0,0.5,0.5,0.5"
-                Height="{Binding Height}"
-                BorderBrush="{Binding IpSegmentNodeBorderBrush, RelativeSource={RelativeSource AncestorType=local:IpFlowDiagram}}">
+            <Border.ToolTip>
+                <ToolTip Template="{Binding SegmentNodeToolTipTemplate}" />
+            </Border.ToolTip>
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="MouseEnter">
                     <i:InvokeCommandAction Command="{Binding MouseEnterIpFlowIpSegment, RelativeSource={RelativeSource AncestorType=local:IpFlowDiagram}}"
@@ -60,11 +42,38 @@
                 </i:EventTrigger>
             </i:Interaction.Triggers>
             <Grid>
-                <Rectangle Fill="{Binding Color}"
-                           Tag="{Binding SegmentFinder}" />
+                <Rectangle Fill="{Binding Color}" />
                 <TextBlock HorizontalAlignment="Center"
                            VerticalAlignment="Center"
-                           Tag="{Binding SegmentFinder}"
+                           Text="{Binding Segment}"
+                           Style="{Binding NodeLabelStyle, RelativeSource={RelativeSource AncestorType=local:IpFlowDiagram}}" />
+            </Grid>
+        </Border>
+    </DataTemplate>
+    <DataTemplate x:Key="DestSegment4ItemTemplate">
+        <Border BorderThickness="0,0.5,0.5,0.5"
+                Height="{Binding Height}"
+                BorderBrush="{Binding IpSegmentNodeBorderBrush, RelativeSource={RelativeSource AncestorType=local:IpFlowDiagram}}">
+            <Border.ToolTip>
+                <ToolTip Template="{Binding SegmentNodeToolTipTemplate}" />
+            </Border.ToolTip>
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="MouseEnter">
+                    <i:InvokeCommandAction Command="{Binding MouseEnterIpFlowIpSegment, RelativeSource={RelativeSource AncestorType=local:IpFlowDiagram}}"
+                                           CommandParameter="{Binding SegmentFinder}" />
+                </i:EventTrigger>
+                <i:EventTrigger EventName="MouseLeave">
+                    <i:InvokeCommandAction Command="{Binding MouseLeaveIpFlowIpSegment, RelativeSource={RelativeSource AncestorType=local:IpFlowDiagram}}" />
+                </i:EventTrigger>
+                <i:EventTrigger EventName="MouseLeftButtonUp">
+                    <i:InvokeCommandAction Command="{Binding MouseLeftButtonUpIpFlowIpSegment, RelativeSource={RelativeSource AncestorType=local:IpFlowDiagram}}"
+                                           CommandParameter="{Binding SegmentFinder}" />
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+            <Grid>
+                <Rectangle Fill="{Binding Color}" />
+                <TextBlock HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
                            Text="{Binding Segment}"
                            Style="{Binding NodeLabelStyle, RelativeSource={RelativeSource AncestorType=local:IpFlowDiagram}}" />
             </Grid>
@@ -75,6 +84,8 @@
                 Value="{StaticResource DefaultLabelStyle}" />
         <Setter Property="LegendLabelStyle"
                 Value="{StaticResource DefaultLegendLabelStyle}" />
+        <Setter Property="SegmentNodeToolTipTemplate"
+                Value="{StaticResource DefaultToolTipTemplate}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:IpFlowDiagram}">
@@ -91,6 +102,9 @@
                                             <Border BorderThickness="0.5"
                                                     Height="{Binding Height}"
                                                     BorderBrush="{Binding IpSegmentNodeBorderBrush, RelativeSource={RelativeSource AncestorType=local:IpFlowDiagram}}">
+                                                <!--<Border.ToolTip>
+                                                    <ToolTip Template="{Binding SegmentNodeToolTipTemplate}" />
+                                                </Border.ToolTip>-->
                                                 <i:Interaction.Triggers>
                                                     <i:EventTrigger EventName="MouseEnter">
                                                         <i:InvokeCommandAction Command="{Binding MouseEnterIpFlowIpSegment, RelativeSource={RelativeSource AncestorType=local:IpFlowDiagram}}"
@@ -105,10 +119,8 @@
                                                     </i:EventTrigger>
                                                 </i:Interaction.Triggers>
                                                 <Grid>
-                                                    <Rectangle Fill="{Binding Color}"
-                                                               Tag="{Binding SegmentFinder}" />
+                                                    <Rectangle Fill="{Binding Color}" />
                                                     <TextBlock HorizontalAlignment="Center"
-                                                               Tag="{Binding SegmentFinder}"
                                                                VerticalAlignment="Center"
                                                                Text="{Binding Segment}"
                                                                Style="{Binding NodeLabelStyle, RelativeSource={RelativeSource AncestorType=local:IpFlowDiagram}}" />

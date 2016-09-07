@@ -23,6 +23,8 @@ namespace Kant.Wpf.Controls.Chart.Example
         public MainViewModel()
         {
             random = new Random();
+            toolTipTemplate1 = (ControlTemplate)Application.Current.FindResource("ToolTipTemplate1");
+            toolTipTemplate2 = (ControlTemplate)Application.Current.FindResource("ToolTipTemplate2");
 
             // random datas
             var count = 55;
@@ -74,6 +76,7 @@ namespace Kant.Wpf.Controls.Chart.Example
             //datas[10].DestinationPort = datas[10].SourcePort = 20;
             //datas[11].DestinationPort = datas[11].SourcePort = 100;
             Datas = datas;
+            ToolTipTemplate = toolTipTemplate1;
         }
 
         #endregion
@@ -156,7 +159,7 @@ namespace Kant.Wpf.Controls.Chart.Example
             {
                 return GetCommand(changeStyles, new RelayCommand(() =>
                 {
-                    
+                    ToolTipTemplate = random.Next(2) == 1 ? toolTipTemplate1 : toolTipTemplate2;
                 }));
             }
         }
@@ -193,7 +196,28 @@ namespace Kant.Wpf.Controls.Chart.Example
             }
         }
 
+        private ControlTemplate toolTipTemplate;
+        public ControlTemplate ToolTipTemplate
+        {
+            get
+            {
+                return toolTipTemplate;
+            }
+            set
+            {
+                if (value != toolTipTemplate)
+                {
+                    toolTipTemplate = value;
+                    RaisePropertyChanged(() => ToolTipTemplate);
+                }
+            }
+        }
+
         private Random random;
+
+        private ControlTemplate toolTipTemplate1;
+
+        private ControlTemplate toolTipTemplate2;
 
         #endregion
     }
